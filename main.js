@@ -82,3 +82,7 @@ for(const key of Object.keys(t)){
   ipcMain.handle(funcName,func)
   console.log("set: ",funcName)
 }
+
+ipcMain.handle("maximizeWindow",(event,args)=>{
+  win.maximize()
+})

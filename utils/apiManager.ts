@@ -44,4 +44,8 @@ export class ApiManager{
             path
         })
     }
+
+    static maximizeWindow(){
+        this.invoke("maximizeWindow",null)
+    }
 }
