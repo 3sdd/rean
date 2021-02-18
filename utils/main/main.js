@@ -24,10 +24,15 @@ function getCwd(event,args){
     return process.cwd()
 }
 
+function showMessageBox(event,args){
+    const {options}=args
+    return dialog.showMessageBox(options)
+}
 
 module.exports={
     existsPath,
     mkdir,
     openDialog,
-    getCwd
+    getCwd,
+    showMessageBox
 }

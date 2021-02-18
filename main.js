@@ -73,10 +73,7 @@ app.on("activate", () => win === null && newWin());
 
 
 const {ipcMain}=require("electron")
-const {openDialog,getCwd} =require("./utils/main/main")
-
 const t=require("./utils/main/main")
-console.log(t)
 
 console.log("ipcMainにセット")
 for(const key of Object.keys(t)){
@@ -85,6 +82,3 @@ for(const key of Object.keys(t)){
   ipcMain.handle(funcName,func)
   console.log("set: ",funcName)
 }
-
-// ipcMain.on("openDirectoryDialog",openDialog)
-// ipcMain.handle("getCwd",getCwd)
