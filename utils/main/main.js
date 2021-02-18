@@ -29,10 +29,16 @@ function showMessageBox(event,args){
     return dialog.showMessageBox(options)
 }
 
+function createEmptyFile(event,args){
+    const {path}=args
+    fs.openSync(path, "w");
+}
+
 module.exports={
     existsPath,
     mkdir,
     openDialog,
     getCwd,
-    showMessageBox
+    showMessageBox,
+    createEmptyFile
 }

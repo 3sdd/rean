@@ -1,5 +1,6 @@
 
 //window.api.send('key')の形から、関数の形で使いやすくする
+//TODO:asyncっていつつけるんだ
 export class ApiManager{
 
     static get api():any{
@@ -25,16 +26,22 @@ export class ApiManager{
     static async createProject(projectName:string,path:string){
         //ルートフォルダー作成
         const rootPath=path+"\\"+projectName
-        this.mkdir(rootPath)
+        await this.mkdir(rootPath)
         
         //画像フォルダー作成
         const imgDirPath=rootPath+"\\"+"images"
-        this.mkdir(imgDirPath)
+        await this.mkdir(imgDirPath)
 
         const annoDirPath=rootPath+"\\"+"annotations"
-        this.mkdir(annoDirPath)
+        await this.mkdir(annoDirPath)
         
-        //TODO:クラスファイル作成　classes.txt
+        const classesPath=rootPath+"\\"+"classes.txt"
+        await this.createEmptyFile(classesPath)
+    }
 
+    static async createEmptyFile(path:string){
+        this.invoke("createEmptyFile",{
+            path
+        })
     }
 }
