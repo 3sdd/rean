@@ -35,7 +35,6 @@ import {ApiManager} from "@/utils/apiManager"
 
 export default Vue.extend({
     data(){
-
         return {
             projectName:"",
             location:"",
@@ -61,7 +60,6 @@ export default Vue.extend({
                 })
                 return
             }
-            // await ApiManager.mkdir("./test")
 
             const dstPath=location+"\\"+projectName //TODO:path.join
             const exists=await ApiManager.existsPath(dstPath)
@@ -77,13 +75,22 @@ export default Vue.extend({
 
             ApiManager.maximizeWindow()
 
-            this.$nuxt.$router.push("/rect-annotator")
+            this.$router.push("/rect-annotator")
         },
         async openDialog(){
-            console.log("hi");
-
-
-            (window as any).api.send("openDirectoryDialog")
+            //TODO:open-project.vueのopenDialogと一緒。まとめる
+            const result=await ApiManager.showOpenDialog({
+                defaultPath:this.location,
+                properties:["openDirectory"]
+            })
+            console.log(result)
+            if(result.canceled){
+                return
+            }
+            if(result.filePaths.length!==1){
+                throw new Error("エラー:ファイルパスの数が１つではない")
+            }
+            this.location=result.filePaths[0]
         }
     }
 })
