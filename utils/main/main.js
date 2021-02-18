@@ -10,6 +10,7 @@ function mkdir(event,path){
     fs.mkdirSync(path)
 }
 
+//TODO:いらない
 async function openDialog(event,args){
     console.log("koko");
     
@@ -44,11 +45,9 @@ async function readClasses(event,args){
     return classes
 }
 
-//TODO:いらない
+
 async function showOpenDialog(event,args){
-    console.log(args)
     const {options}=args
-    console.log(options)
     return dialog.showOpenDialog(options)
 }
 
