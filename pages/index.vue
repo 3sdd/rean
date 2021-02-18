@@ -3,7 +3,6 @@
     <div>
       <h1 style="background-color:red;">{{word}}</h1>
       <nuxt-link to="/create-project">プロジェクト作成</nuxt-link>
-      <p>{{testClass.arg}}</p>
       <!-- <Logo /> -->
       <!-- <h1 class="title">
         rean
@@ -32,13 +31,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import {TestClass} from "@/utils/testClass"
+
 export default Vue.extend({
   data(){
-    const testClass=new TestClass("test class")
     return {
       word:"hello world!",
-      testClass:testClass
     }
   }
 })
