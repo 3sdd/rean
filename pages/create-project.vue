@@ -37,11 +37,15 @@ export default Vue.extend({
         }
     },
     methods:{
-        create(){
+        async create(){
             const projectName=this.projectName
             const location=(this as any).location //TODO
 
             alert([projectName,location])
+
+            // const exits=await ApiManager.existsPath("./test")
+            // await ApiManager.mkdir("./test")
+            // console.log(exits)
         },
         async open(){
             console.log("hi");

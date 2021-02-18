@@ -1,4 +1,14 @@
 const {dialog} =require("electron")
+const fs=require("fs")
+
+
+function existsPath(event,path){
+    return fs.existsSync(path)
+}
+
+function mkdir(event,path){
+    fs.mkdirSync(path)
+}
 
 async function openDialog(event,args){
     console.log("koko");
@@ -16,6 +26,8 @@ function getCwd(event,args){
 
 
 module.exports={
+    existsPath,
+    mkdir,
     openDialog,
     getCwd
 }
