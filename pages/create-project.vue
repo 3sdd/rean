@@ -8,7 +8,8 @@
         </div>
         <div>
             <label>場所</label>
-            <span>{{location}}</span> <button>参照</button>
+            <span>{{location}}</span> 
+            <button @click="open()">参照</button>
         </div>
 
         <div>
@@ -20,20 +21,33 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import {ApiManager} from "@/utils/apiManager"
+
 export default Vue.extend({
+    async asyncData(){
+        const cwd:string=await ElectronApi.getCwd()
+        return {
+            location:cwd,
+        }
+    },
     data(){
+
         return {
             projectName:"",
-            location:"C:\\users ....",
         }
     },
     methods:{
         create(){
-
             const projectName=this.projectName
-            const location=this.location
+            const location=(this as any).location //TODO
 
             alert([projectName,location])
+        },
+        async open(){
+            console.log("hi");
+
+
+            (window as any).api.send("openDirectoryDialog")
         }
     }
 })
