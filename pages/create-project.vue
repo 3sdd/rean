@@ -13,7 +13,7 @@
         <div class="ml-2 mb-12">
             <label class="block mb-1">場所</label>
             <span class="p-2 border border-gray-400">{{location}}</span> 
-            <button @click="open()" class="border border-gray-400 p-2">参照</button>
+            <button @click="openDialog()" class="border border-gray-400 p-2">参照</button>
         </div>
 
         <div class="">
@@ -80,7 +80,7 @@ export default Vue.extend({
 
             this.$nuxt.$router.push("/rect-annotator")
         },
-        async open(){
+        async openDialog(){
             console.log("hi");
 
 
