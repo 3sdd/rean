@@ -31,7 +31,8 @@ function showMessageBox(event,args){
 
 function createEmptyFile(event,args){
     const {path}=args
-    fs.openSync(path, "w");
+    f=fs.openSync(path, "w");
+    fs.closeSync(f)
 }
 
 module.exports={
