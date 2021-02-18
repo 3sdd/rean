@@ -34,23 +34,22 @@ import Vue from 'vue'
 import {ApiManager} from "@/utils/apiManager"
 
 export default Vue.extend({
-    async asyncData(){
-        const cwd:string=await ApiManager.getCwd()
-        return {
-            location:cwd,
-        }
-    },
     data(){
 
         return {
             projectName:"",
+            location:"",
         }
+    },
+    async fetch(){
+        const cwd:string=await ApiManager.getCwd()
+        this.location=cwd
     },
     methods:{
         async create(){
             //TODO:2回目の作成ボタン押したときに重複して作らないようにする
             const projectName=this.projectName
-            const location=((this as any).location) as string //TODO
+            const location=this.location
             console.log(location)
 
             if(projectName===""){
