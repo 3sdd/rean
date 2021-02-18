@@ -1,0 +1,30 @@
+{
+  "name": "rean",
+  "version": "0.0.1",
+  "author": "msdd",
+  "description": "rean",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development electron .",
+    "build": "cross-env NODE_ENV=production nuxt build && electron-builder"
+  },
+  "build": {
+    "appId": "rean",
+    "directories": {
+      "output": "build"
+    }
+  },
+  "dependencies": {
+    "core-js": "^3.8.3",
+    "nuxt": "^2.14.12"
+  },
+  "devDependencies": {
+    "@nuxt/types": "^2.15.0",
+    "@nuxt/typescript-build": "^2.0.4",
+    "cross-env": "^7.0.3",
+    "electron": "^11.2.3",
+    "electron-builder": "^22.9.1",
+    "electron-devtools-installer": "^3.1.1"
+  }
+}
