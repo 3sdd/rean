@@ -25,7 +25,7 @@ import {ApiManager} from "@/utils/apiManager"
 
 export default Vue.extend({
     async asyncData(){
-        const cwd:string=await ElectronApi.getCwd()
+        const cwd:string=await ApiManager.getCwd()
         return {
             location:cwd,
         }
