@@ -53,4 +53,10 @@ export class ApiManager{
         const classes=await  this.invoke("readClasses",{path})
         return classes as string[]
     }
+
+    static async showOpenDialog(options:any){
+        return this.invoke("showOpenDialog",{
+            options
+        })
+    }
 }
