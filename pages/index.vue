@@ -2,6 +2,7 @@
   <div class="container">
     <div>
       <h1 style="background-color:red;">{{word}}</h1>
+      <nuxt-link to="/create-project">プロジェクト作成</nuxt-link>
       <p>{{testClass.arg}}</p>
       <!-- <Logo /> -->
       <!-- <h1 class="title">
