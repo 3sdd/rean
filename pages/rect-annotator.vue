@@ -39,6 +39,8 @@ export default Vue.extend({
         const path="./test/classes.txt" //TODO:プロジェクトのclassファイルに変える
         const classes=await ApiManager.readClasses(path)
         this.classes=classes
+
+        ApiManager.maximizeWindow()
     }
 })
 </script>

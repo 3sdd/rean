@@ -72,9 +72,7 @@ export default Vue.extend({
                 return
             }
             await ApiManager.createProject(projectName,location)
-
-            ApiManager.maximizeWindow()
-
+            
             this.$router.push("/rect-annotator")
         },
         async openDialog(){
