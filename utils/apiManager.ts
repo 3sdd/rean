@@ -48,4 +48,9 @@ export class ApiManager{
     static maximizeWindow(){
         this.invoke("maximizeWindow",null)
     }
+
+    static async readClasses(path:string){
+        const classes=await  this.invoke("readClasses",{path})
+        return classes as string[]
+    }
 }

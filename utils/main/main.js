@@ -1,6 +1,6 @@
 const {dialog} =require("electron")
 const fs=require("fs")
-
+const readline=require("readline")
 
 function existsPath(event,path){
     return fs.existsSync(path)
@@ -35,11 +35,21 @@ function createEmptyFile(event,args){
     fs.closeSync(f)
 }
 
+//classes.txtを読み込んでクラスをリスト形式で返す
+async function readClasses(event,args){
+    const {path}=args
+
+    const text=fs.readFileSync(path).toString() //TODO:非同期で
+    const classes=text.replace(/\r\n/g,"\n").split("\n")
+    return classes
+}
+
 module.exports={
     existsPath,
     mkdir,
     openDialog,
     getCwd,
     showMessageBox,
-    createEmptyFile
+    createEmptyFile,
+    readClasses
 }
