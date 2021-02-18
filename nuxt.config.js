@@ -32,7 +32,7 @@ module.exports = {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxt/typescript-build'],
+  buildModules: ['@nuxt/typescript-build','@nuxtjs/tailwindcss'],
   /*
    ** Nuxt.js modules
    */
