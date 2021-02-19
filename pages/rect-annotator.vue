@@ -18,10 +18,20 @@
                     {{projectInfo}}
                 </div>
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
-                    <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
+                    <canvas :width="canvasWidth" :height="canvasHeight"
+                        @mousedown="mousedown"
+                        @mouseup="mouseup"
                         @mousemove="mousemove"
                         @mouseenter="mouseenter"
                         @mouseleave="mouseleave"
+                        class="absolute z-40"
+                    ></canvas>
+                    <canvas ref="annotationCanvas" :width="canvasWidth" :height="canvasHeight"
+                        class="absolute z-30"
+                    >
+                    </canvas>
+                    <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
+ 
                         class="absolute z-20"
                     ></canvas>
                     <canvas ref="imageCanvas" :width="canvasWidth" :height="canvasHeight"
@@ -53,6 +63,11 @@ export default Vue.extend({
             canvasWidth:800,
             canvasHeight:800,
             showDotLine:false,
+            makingRectangle:false,
+            rectangle:{
+                point1:{x:0,y:0},
+                point2:{x:0,y:0}
+            }
         }
     },
     async mounted(){
@@ -83,7 +98,7 @@ export default Vue.extend({
         selectedImageIndex():number{
             return this.projectInfo.selectedImageIndex as number
         },
-
+        
         imgCtx(){
             const canvas=<HTMLCanvasElement>this.$refs.imageCanvas
             const ctx=canvas.getContext("2d")
@@ -99,16 +114,25 @@ export default Vue.extend({
                 throw new Error("エラー:getContex('2d')")
             }
             return ctx
+        },
+        annotationCtx(){
+            const canvas=<HTMLCanvasElement>this.$refs.annotationCanvas
+            const ctx=canvas.getContext("2d")
+            if(!ctx){
+                throw new Error("エラー:getContex('2d')")
+            }
+            return ctx
         }
     },
     methods:{
         imageSelected(index:number){
             this.$store.commit("project/updateSelectedImage",index)
-            this.changeCanvasImage(this.selectedImageIndex)
+            this.changeImage(this.selectedImageIndex)
+            this.annotationCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
         },
         
         //canvaの画像を選択された画像に変更
-        changeCanvasImage(index:number){
+        changeImage(index:number){
             const ctx=this.imgCtx
 
             const base64image=this.base64images[index]
@@ -123,14 +147,21 @@ export default Vue.extend({
             image.src=base64image
         },
         mousemove(e:any){
-            if(!this.showDotLine){
-                return
-            }
-            this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
+            const ctx=this.mainCtx
+            ctx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
+
             const x=e.offsetX
             const y=e.offsetY
+            if(this.showDotLine){
+                ctx.strokeStyle="gray"
+                this.drawCrossLine(ctx,x,y)
+            }
 
-            this.drawCrossLine(x,y)
+            if(this.makingRectangle){
+                ctx.setLineDash([])
+                ctx.strokeStyle="black"
+                this.drawBox(ctx,this.rectangle.point1,{x,y})
+            }
         },
         mouseenter(e:any){
             this.showDotLine=true
@@ -139,25 +170,69 @@ export default Vue.extend({
             this.showDotLine=false
             this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
         },
-        drawCrossLine(x:number,y:number){
-            const ctx=this.mainCtx 
+        drawCrossLine(ctx:CanvasRenderingContext2D, x:number,y:number){
+
+            ctx.setLineDash([5,5])
 
             ctx.beginPath()
-            ctx.strokeStyle="gray"
             ctx.lineWidth=2
-            ctx.setLineDash([5,5])
             ctx.moveTo(x,0)
             ctx.lineTo(x,this.canvasWidth)
             ctx.stroke()
             ctx.closePath()
+
             
             ctx.beginPath()
             ctx.setLineDash([5,5])
+
             ctx.moveTo(0,y)
             ctx.lineTo(this.canvasHeight,y)
             ctx.stroke()
             ctx.closePath()
-        }
+        },
+        mousedown(e:any){
+            if(!this.makingRectangle){
+                this.makingRectangle=true
+                const x=e.offsetX
+                const y=e.offsetY
+                this.rectangle.point1.x=x
+                this.rectangle.point1.y=y
+            }
+            console.log("mousedown")
+
+        },
+        mouseup(e:any){
+            console.log("mouseup")
+            if(this.makingRectangle){
+                this.makingRectangle=false
+                const x=e.offsetX
+                const y=e.offsetY
+
+                this.rectangle.point2.x=x
+                this.rectangle.point2.y=y
+
+                this.addBox(this.rectangle.point1,this.rectangle.point2)
+                this.annotationCtx.strokeStyle="red"
+                this.drawBox(this.annotationCtx,this.rectangle.point1,this.rectangle.point2)
+            }
+
+        },
+        drawBox(ctx:CanvasRenderingContext2D,point1:{x:number,y:number},point2:{x:number,y:number},
+                lineWidth:number=3){
+            const maxX=Math.max(point1.x,point2.x)
+            const minX=Math.min(point1.x,point2.x)
+            const maxY=Math.max(point1.y,point2.y)
+            const minY=Math.min(point1.y,point2.y)
+
+            const w=maxX-minX
+            const h=maxY-minY
+            
+            ctx.lineWidth=lineWidth
+            ctx.strokeRect(minX,minY,w,h)
+        },
+        addBox(point1:{x:number,y:number},potin2:{x:number,y:number}){
+            
+        },
     }
 })
 </script>
