@@ -1,7 +1,7 @@
 <template>
     <div>
         <img :src="src"
-            class="p-2 bg-gray-900 h-40 w-full"
+            class="p-2 h-40 w-full"
             width=""
             height="100px"
         />

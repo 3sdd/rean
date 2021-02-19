@@ -6,11 +6,15 @@
         </div>
         <div class="flex-1 flex flex-row bg-blue-400">
             <div class="w-40 h-ful overflow-y-auto">
-                <div v-for="(b64img,i) in base64images" :key="'b64img'+i">
-                    <ThumbnailImage :src="b64img"></ThumbnailImage>
-                </div>
+                <ThumbnailViewer 
+                    :base64images="base64images"
+                    :selectedImageIndex="selectedImageIndex"
+                    @image-selected="imageSelected"
+                >
+                </ThumbnailViewer>
             </div>
             <div class="flex-1 bg-purple-300">
+                {{projectInfo}}
                 <canvas></canvas>
             </div>
             <div class="w-48 bg-purple-600 p-2">
@@ -23,12 +27,11 @@
 import Vue from 'vue'
 import {ApiManager} from "@/utils/apiManager"
 import ClassList from "@/components/ClassList.vue"
-import ThumbnailImage from "@/components/ThumbnailImage.vue"
-
+import ThumbnailViewer from "@/components/ThumbnailViewer.vue"
 export default Vue.extend({
     components:{
         ClassList,
-        ThumbnailImage
+        ThumbnailViewer
     },
     data(){
         return {
@@ -60,6 +63,14 @@ export default Vue.extend({
 
         classes():string[]{
             return this.projectInfo.classes as string[]
+        },
+        selectedImageIndex():number{
+            return this.projectInfo.selectedImageIndex as number
+        }
+    },
+    methods:{
+        imageSelected(index:number){
+            this.$store.commit("project/updateSelectedImage",index)
         }
     }
 })

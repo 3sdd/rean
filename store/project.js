@@ -14,6 +14,9 @@ export const mutations={
     loadClasses(state,classes){
         state.projectInfo.classes=classes
     },
+    updateSelectedImage(state,index){
+        state.projectInfo.selectedImageIndex=index
+    }
     // add(state,text){
     //     state.list.push({
     //         text,
