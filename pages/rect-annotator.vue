@@ -31,21 +31,15 @@ export default Vue.extend({
         ThumbnailImage
     },
     data(){
-        const testClasses=[
-            "class_A",
-            "class_B"
-        ]
-        const classes=testClasses
-        
         return {
-            classes, 
+            // classes:[] as Array<string>, 
             base64images:[] as Array<string>
         }
     },
     async mounted(){
         const path="./test/classes.txt" //TODO:プロジェクトのclassファイルに変える
         const classes=await ApiManager.readClasses(path)
-        this.classes=classes
+        this.$store.commit("project/loadClasses",classes)
 
         ApiManager.maximizeWindow()
 
@@ -58,8 +52,15 @@ export default Vue.extend({
             this.base64images.push("data:image/png;base64,"+base64Image)
         }
         
+    },
+    computed:{
+        projectInfo(){
+            return this.$store.state.project.projectInfo
+        },
 
-        //URL.removeObjectURL()
+        classes():string[]{
+            return this.projectInfo.classes as string[]
+        }
     }
 })
 </script>
