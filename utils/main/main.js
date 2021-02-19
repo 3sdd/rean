@@ -1,6 +1,6 @@
 const {dialog} =require("electron")
 const fs=require("fs")
-const readline=require("readline")
+const fsPromise=require("fs").promises
 
 function existsPath(event,path){
     return fs.existsSync(path)
@@ -8,17 +8,6 @@ function existsPath(event,path){
 
 function mkdir(event,path){
     fs.mkdirSync(path)
-}
-
-//TODO:いらない
-async function openDialog(event,args){
-    console.log("koko");
-    
-
-    const ret=await dialog.showOpenDialog({
-        properties:["openDirectory"]
-    })
-    return ret
 }
 
 function getCwd(event,args){
@@ -51,13 +40,28 @@ async function showOpenDialog(event,args){
     return dialog.showOpenDialog(options)
 }
 
+
+async function readdir(event,args){
+    const {path}=args
+    const files=await fsPromise.readdir(path)
+    return files
+}
+
+async function readImageAsBase64(event,args){
+    const {path}=args
+    const buffer=await fsPromise.readFile(path)
+    const base64=buffer.toString("base64")
+    return base64
+}
+
 module.exports={
     existsPath,
     mkdir,
-    openDialog,
     getCwd,
     showMessageBox,
     createEmptyFile,
     readClasses,
-    showOpenDialog
+    showOpenDialog,
+    readdir,
+    readImageAsBase64
 }

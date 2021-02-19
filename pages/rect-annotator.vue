@@ -6,6 +6,9 @@
         </div>
         <div class="flex-1 flex flex-row bg-blue-400">
             <div class="w-40">
+                <div v-if="base64image!==''">
+                    <ThumbnailImage :src="base64image"></ThumbnailImage>
+                </div>
             </div>
             <div class="flex-1 bg-purple-300">
                 <canvas></canvas>
@@ -20,10 +23,12 @@
 import Vue from 'vue'
 import {ApiManager} from "@/utils/apiManager"
 import ClassList from "@/components/ClassList.vue"
+import ThumbnailImage from "@/components/ThumbnailImage.vue"
 
 export default Vue.extend({
     components:{
-        ClassList
+        ClassList,
+        ThumbnailImage
     },
     data(){
         const testClasses=[
@@ -32,7 +37,8 @@ export default Vue.extend({
         ]
         const classes=testClasses
         return {
-            classes
+            classes,
+            base64image:"",
         }
     },
     async mounted(){
@@ -41,6 +47,21 @@ export default Vue.extend({
         this.classes=classes
 
         ApiManager.maximizeWindow()
+
+        const imgRoot="./test/images"
+        const imageFiles=await ApiManager.readdir(imgRoot)
+        console.log(imageFiles)
+        
+        const imgPath=imgRoot+"\\"+imageFiles[0]
+        const base64Image=await ApiManager.readImageAsBase64(imgPath)
+        console.log("base64")
+        console.log(base64Image)
+
+        this.base64image="data:image/png;base64,"+base64Image
+        
+        
+
+        //URL.removeObjectURL()
     }
 })
 </script>

@@ -59,4 +59,17 @@ export class ApiManager{
             options
         })
     }
+
+    static async readdir(path:string){
+        return this.invoke("readdir",{
+            path
+        })
+    }
+
+    static async readImageAsBase64(path:string){
+        const ret=await this.invoke("readImageAsBase64",{
+            path
+        })
+        return ret as string
+    }
 }
