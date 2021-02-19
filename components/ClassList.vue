@@ -18,7 +18,7 @@ export default Vue.extend({
         classes:{
             type:Array,
             required:false,
-            default:[]
+            default:()=>[]
         }
     }
 })
