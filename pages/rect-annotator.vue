@@ -5,9 +5,9 @@
             <p>残り枚数 10000枚</p>
         </div>
         <div class="flex-1 flex flex-row bg-blue-400">
-            <div class="w-40">
-                <div v-if="base64image!==''">
-                    <ThumbnailImage :src="base64image"></ThumbnailImage>
+            <div class="w-40 h-ful overflow-y-auto">
+                <div v-for="(b64img,i) in base64images" :key="'b64img'+i">
+                    <ThumbnailImage :src="b64img"></ThumbnailImage>
                 </div>
             </div>
             <div class="flex-1 bg-purple-300">
@@ -36,9 +36,10 @@ export default Vue.extend({
             "class_B"
         ]
         const classes=testClasses
+        
         return {
-            classes,
-            base64image:"",
+            classes, 
+            base64images:[] as Array<string>
         }
     },
     async mounted(){
@@ -48,17 +49,14 @@ export default Vue.extend({
 
         ApiManager.maximizeWindow()
 
-        const imgRoot="./test/images"
+        const imgRoot="./test/images" //TODO:プロジェクトの画像フォルダーのパスに変える
         const imageFiles=await ApiManager.readdir(imgRoot)
-        console.log(imageFiles)
-        
-        const imgPath=imgRoot+"\\"+imageFiles[0]
-        const base64Image=await ApiManager.readImageAsBase64(imgPath)
-        console.log("base64")
-        console.log(base64Image)
 
-        this.base64image="data:image/png;base64,"+base64Image
-        
+        for(const imgFile of imageFiles){
+            const imgPath=imgRoot+"\\"+imgFile
+            const base64Image=await ApiManager.readImageAsBase64(imgPath)
+            this.base64images.push("data:image/png;base64,"+base64Image)
+        }
         
 
         //URL.removeObjectURL()
