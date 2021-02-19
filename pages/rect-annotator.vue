@@ -17,8 +17,15 @@
                 <div>
                     {{projectInfo}}
                 </div>
-                <div class="bg-green-300 flex justify-center items-center">
-                    <canvas ref="mainCanvas" width="800px" height="800px"></canvas>
+                <div class="bg-green-300 flex justify-center items-center h-full relative">
+                    <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
+                        @mousemove="mousemove"
+                        class="absolute z-20"
+                    ></canvas>
+                    <canvas ref="imageCanvas" :width="canvasWidth" :height="canvasHeight"
+                        class="absolute z-10"
+                    >
+                    </canvas>
                 </div>
             </div>
             <div class="w-48 bg-purple-600 p-2">
@@ -40,7 +47,9 @@ export default Vue.extend({
     data(){
         return {
             // classes:[] as Array<string>, 
-            base64images:[] as Array<string>
+            base64images:[] as Array<string>,
+            canvasWidth:800,
+            canvasHeight:800,
         }
     },
     async mounted(){
@@ -70,6 +79,23 @@ export default Vue.extend({
         },
         selectedImageIndex():number{
             return this.projectInfo.selectedImageIndex as number
+        },
+
+        imgCtx(){
+            const canvas=<HTMLCanvasElement>this.$refs.imageCanvas
+            const ctx=canvas.getContext("2d")
+            if(!ctx){
+                throw new Error("エラー:getContex('2d')")
+            }
+            return ctx
+        },
+        mainCtx(){
+            const canvas=<HTMLCanvasElement>this.$refs.mainCanvas
+            const ctx=canvas.getContext("2d")
+            if(!ctx){
+                throw new Error("エラー:getContex('2d')")
+            }
+            return ctx
         }
     },
     methods:{
@@ -80,22 +106,42 @@ export default Vue.extend({
         
         //canvaの画像を選択された画像に変更
         changeCanvasImage(index:number){
-            const canvas=<HTMLCanvasElement>this.$refs.mainCanvas
-            const ctx=canvas.getContext("2d")
-            if(!ctx){
-                throw new Error("エラー:getContex('2d')")
-            }
+            const ctx=this.imgCtx
 
             const base64image=this.base64images[index]
 
             const image=new Image()
-            const width=800 //TODO 
-            const height=800 //TODO
+            const width=this.canvasWidth
+            const height=this.canvasHeight
             image.onload=(e)=>{
                 //TODO:変形されてる?
                 ctx.drawImage(image,0,0,width,height)
             }
             image.src=base64image
+        },
+        mousemove(e:any){
+            this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
+            const x=e.offsetX
+            const y=e.offsetY
+
+            this.drawCrossLine(x,y)
+        },
+        drawCrossLine(x:number,y:number){
+            const ctx=this.mainCtx 
+
+            ctx.beginPath()
+            ctx.strokeStyle="black"
+            ctx.lineWidth=2
+            ctx.moveTo(x,0)
+            ctx.lineTo(x,this.canvasWidth)
+            ctx.stroke()
+            ctx.closePath()
+            
+            ctx.beginPath()
+            ctx.moveTo(0,y)
+            ctx.lineTo(this.canvasHeight,y)
+            ctx.stroke()
+            ctx.closePath()
         }
     }
 })
