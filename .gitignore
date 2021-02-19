@@ -90,3 +90,7 @@ sw.*
 *.swp
 
 build/
+
+
+#　テスト用のプロジェクト
+TestProject/
