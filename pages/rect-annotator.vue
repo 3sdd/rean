@@ -14,8 +14,12 @@
                 </ThumbnailViewer>
             </div>
             <div class="flex-1 bg-purple-300">
-                {{projectInfo}}
-                <canvas></canvas>
+                <div>
+                    {{projectInfo}}
+                </div>
+                <div class="bg-green-300 flex justify-center items-center">
+                    <canvas ref="mainCanvas" width="800px" height="800px"></canvas>
+                </div>
             </div>
             <div class="w-48 bg-purple-600 p-2">
                 <ClassList :classes="classes"></ClassList>
@@ -71,6 +75,27 @@ export default Vue.extend({
     methods:{
         imageSelected(index:number){
             this.$store.commit("project/updateSelectedImage",index)
+            this.changeCanvasImage(this.selectedImageIndex)
+        },
+        
+        //canvaの画像を選択された画像に変更
+        changeCanvasImage(index:number){
+            const canvas=<HTMLCanvasElement>this.$refs.mainCanvas
+            const ctx=canvas.getContext("2d")
+            if(!ctx){
+                throw new Error("エラー:getContex('2d')")
+            }
+
+            const base64image=this.base64images[index]
+
+            const image=new Image()
+            const width=800 //TODO 
+            const height=800 //TODO
+            image.onload=(e)=>{
+                //TODO:変形されてる?
+                ctx.drawImage(image,0,0,width,height)
+            }
+            image.src=base64image
         }
     }
 })
