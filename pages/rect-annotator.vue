@@ -20,6 +20,8 @@
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
                     <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
                         @mousemove="mousemove"
+                        @mouseenter="mouseenter"
+                        @mouseleave="mouseleave"
                         class="absolute z-20"
                     ></canvas>
                     <canvas ref="imageCanvas" :width="canvasWidth" :height="canvasHeight"
@@ -50,6 +52,7 @@ export default Vue.extend({
             base64images:[] as Array<string>,
             canvasWidth:800,
             canvasHeight:800,
+            showDotLine:false,
         }
     },
     async mounted(){
@@ -120,24 +123,36 @@ export default Vue.extend({
             image.src=base64image
         },
         mousemove(e:any){
+            if(!this.showDotLine){
+                return
+            }
             this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
             const x=e.offsetX
             const y=e.offsetY
 
             this.drawCrossLine(x,y)
         },
+        mouseenter(e:any){
+            this.showDotLine=true
+        },
+        mouseleave(e:any){
+            this.showDotLine=false
+            this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
+        },
         drawCrossLine(x:number,y:number){
             const ctx=this.mainCtx 
 
             ctx.beginPath()
-            ctx.strokeStyle="black"
+            ctx.strokeStyle="gray"
             ctx.lineWidth=2
+            ctx.setLineDash([5,5])
             ctx.moveTo(x,0)
             ctx.lineTo(x,this.canvasWidth)
             ctx.stroke()
             ctx.closePath()
             
             ctx.beginPath()
+            ctx.setLineDash([5,5])
             ctx.moveTo(0,y)
             ctx.lineTo(this.canvasHeight,y)
             ctx.stroke()
