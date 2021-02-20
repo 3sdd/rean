@@ -111,6 +111,8 @@ export default Vue.extend({
             // this.base64images.push(imageData.base64image)
             this.imageDataList.push(imageData)
         }
+
+        this.imageSelected(this.selectedImageIndex)
         
     },
     computed:{

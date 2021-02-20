@@ -1,11 +1,10 @@
-import { loading } from "~/nuxt.config"
 
 export class ProjectInfo{
     projectName:string
     location:string
 
     classes:string[]=[]
-    selectedImageIndex:number=-1
+    selectedImageIndex:number=0
 
     constructor(projectName:string,location:string){
         this.projectName=projectName
