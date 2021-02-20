@@ -18,14 +18,6 @@
                     {{projectInfo}}
                 </div>
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
-                    <!-- <canvas :width="canvasWidth" :height="canvasHeight"
-
-                        class="absolute z-40"
-                    ></canvas> -->
-                    <!-- <canvas ref="annotationCanvas" :width="canvasWidth" :height="canvasHeight"
-                        class="absolute z-30"
-                    >
-                    </canvas> -->
                     <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
  
                         class="absolute z-20"
@@ -143,14 +135,6 @@ export default Vue.extend({
             }
             return ctx
         },
-        // annotationCtx(){
-        //     const canvas=<HTMLCanvasElement>this.$refs.annotationCanvas
-        //     const ctx=canvas.getContext("2d")
-        //     if(!ctx){
-        //         throw new Error("エラー:getContex('2d')")
-        //     }
-        //     return ctx
-        // }
     },
     methods:{
         async imageSelected(index:number){
@@ -180,8 +164,6 @@ export default Vue.extend({
                 this.annotationData=AnnotationData.fromJsonString(jsonString)
                 console.log("aruyo")
                 console.log(jsonString)
-
-                // drawBoundingBoxes(this.annotationCtx,this.annotationData.boundingBoxes)
 
             }else{
                 this.annotationData=new AnnotationData()
@@ -248,8 +230,6 @@ export default Vue.extend({
                 this.rectangle.point2.y=y
 
                 this.addBox(this.rectangle.point1,this.rectangle.point2)
-                // drawBox(this.annotationCtx,this.rectangle.point1,this.rectangle.point2)
-                // drawBoundingBox(this.annotationCtx,BoundingBox.fromTwoPoints(this.rectangle.point1,this.rectangle.point2,"label"))
             }
 
         },
