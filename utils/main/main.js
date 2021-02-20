@@ -49,22 +49,36 @@ async function readdir(event,args){
 }
 
 //TODO:全部pngになってる
-function addPrefix(base64image){
-    return "data:image/png;base64,"+base64image
+function addPrefix(extension,base64image){
+    let mime=""
+    switch(extension){
+        case "jpg":
+        case "jpeg":
+            mime="image/jpeg"
+        case "png":
+            mime="image/png"
+            break
+        default:
+            throw new Error("not supported extension:",extension)
+    }
+
+    return `data:${mime};base64,`+base64image
 }
 
 async function readImageAsBase64(event,args){
-    const {path}=args
-    const buffer=await fsPromise.readFile(path)
-    const base64=addPrefix(buffer.toString("base64")) 
+    const {path:p}=args
+    const extension=path.extname(p).replace(".","")
+    const buffer=await fsPromise.readFile(p)
+    const base64=addPrefix(extension,buffer.toString("base64")) 
     return base64
 }
 
 async function readImageData(event,args){
     const {path:p}=args
+    const extension=path.extname(p).replace(".","")
     const filename=path.basename(p)
     const buffer=await fsPromise.readFile(p)
-    const base64=addPrefix(buffer.toString("base64"))
+    const base64=addPrefix(extension,buffer.toString("base64"))
 
     return {
         filename:filename,
