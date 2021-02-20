@@ -56,6 +56,7 @@ function addPrefix(extension,base64image){
         case "jpg":
         case "jpeg":
             mime="image/jpeg"
+            break
         case "png":
             mime="image/png"
             break
