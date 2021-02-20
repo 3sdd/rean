@@ -1,6 +1,7 @@
 const {dialog} =require("electron")
 const fs=require("fs")
 const fsPromise=require("fs").promises
+const path=require("path")
 
 function existsPath(event,path){
     return fs.existsSync(path)
@@ -47,11 +48,28 @@ async function readdir(event,args){
     return files
 }
 
+//TODO:全部pngになってる
+function addPrefix(base64image){
+    return "data:image/png;base64,"+base64image
+}
+
 async function readImageAsBase64(event,args){
     const {path}=args
     const buffer=await fsPromise.readFile(path)
-    const base64=buffer.toString("base64")
+    const base64=addPrefix(buffer.toString("base64")) 
     return base64
+}
+
+async function readImageData(event,args){
+    const {path:p}=args
+    const filename=path.basename(p)
+    const buffer=await fsPromise.readFile(p)
+    const base64=addPrefix(buffer.toString("base64"))
+
+    return {
+        filename:filename,
+        base64image:base64
+    }
 }
 
 async function writeFile(event,args){
@@ -75,6 +93,7 @@ module.exports={
     showOpenDialog,
     readdir,
     readImageAsBase64,
+    readImageData,
     writeFile,
     readFile
 }

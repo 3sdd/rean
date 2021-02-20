@@ -7,7 +7,7 @@
         <div class="flex-1 flex flex-row bg-blue-400">
             <div class="w-40 h-ful overflow-y-auto">
                 <ThumbnailViewer 
-                    :base64images="base64images"
+                    :base64images="getBase64Images()"
                     :selectedImageIndex="selectedImageIndex"
                     @image-selected="imageSelected"
                 >
@@ -68,6 +68,7 @@ import {drawBox,clear,drawCrossLine, drawBoundingBoxes,drawBoundingBox} from "@/
 import { ProjectInfo } from '~/utils/projectInfo'
 import {IPoint} from "@/utils/utils"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
+import { IImageData } from '~/utils/imageData'
 
 export default Vue.extend({
     components:{
@@ -78,7 +79,8 @@ export default Vue.extend({
     },
     data(){
         return {
-            base64images:[] as Array<string>,
+            // base64images:[] as Array<string>,
+            imageDataList:[] as Array<IImageData>,
             canvasWidth:800,
             canvasHeight:800,
             showDotLine:false,
@@ -104,8 +106,10 @@ export default Vue.extend({
 
         for(const imgFile of imageFiles){
             const imgPath=imgRoot+"\\"+imgFile
-            const base64Image=await ApiManager.readImageAsBase64(imgPath)
-            this.base64images.push("data:image/png;base64,"+base64Image)
+            const imageData=await ApiManager.readImageData(imgPath)
+            console.log(imageData)
+            // this.base64images.push(imageData.base64image)
+            this.imageDataList.push(imageData)
         }
         
     },
@@ -145,7 +149,8 @@ export default Vue.extend({
             //アノテーションデータを保存する (前の画像があるとき)
             if(previousSelectedImageIndex!==-1){ 
                 //TODO:annotationファイルの名前を 画像名.jsonにしたい
-                const annotationPath=annotationRootPath+"\\"+`annotation_${previousSelectedImageIndex}.json`
+                const filename=this.imageDataList[previousSelectedImageIndex].filename
+                const annotationPath=annotationRootPath+"\\"+`${filename}.json`
                 const annotation=this.annotationData?.toJsonString()
                 console.log(annotation)
                 if(!this.annotationData){
@@ -177,7 +182,7 @@ export default Vue.extend({
         changeImage(index:number){
             const ctx=this.imgCtx
 
-            const base64image=this.base64images[index]
+            const base64image=this.imageDataList[index].base64image
 
             const image=new Image()
             const width=this.canvasWidth
@@ -245,6 +250,9 @@ export default Vue.extend({
         onClickClass(index:number){
             console.log("class clicked:"+index)
             console.log(this.classes[index])
+        },
+        getBase64Images(){
+            return this.imageDataList.map(x=>x.base64image)
         }
     }
 })

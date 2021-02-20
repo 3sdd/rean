@@ -1,5 +1,8 @@
 
 //window.api.send('key')の形から、関数の形で使いやすくする
+
+import { IImageData } from "./imageData"
+
 //TODO:asyncっていつつけるんだ
 export class ApiManager{
 
@@ -73,6 +76,13 @@ export class ApiManager{
         return ret as string
     }
 
+    static async readImageData(path:string){
+        const ret:IImageData=await this.invoke("readImageData",{
+            path
+        })
+        return ret
+    }
+
     static async writeFile(path:string,data:any){
         await this.invoke("writeFile",{path,data})
     }
@@ -80,4 +90,5 @@ export class ApiManager{
         const content=await this.invoke("readFile",{path})
         return content as string
     }
+
 }
