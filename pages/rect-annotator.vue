@@ -51,7 +51,9 @@
                 </div>
             </div>
             <div class="w-48 bg-purple-600 p-2">
-                <ClassList :classes="classes"></ClassList>
+                <ClassList :classes="classes"
+                    @class-clicked="onClickClass"
+                ></ClassList>
             </div>
         </div>
     </div>
@@ -239,6 +241,10 @@ export default Vue.extend({
         },
         removeBoundingBox(index:number){
             this.annotationData?.removeBoundingBox(index)
+        },
+        onClickClass(index:number){
+            console.log("class clicked:"+index)
+            console.log(this.classes[index])
         }
     }
 })

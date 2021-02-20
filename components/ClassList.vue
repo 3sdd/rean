@@ -23,8 +23,8 @@ export default Vue.extend({
         }
     },
     methods:{
-        onClick(index:number){
-            this.$nuxt.$emit("class-clicked",index)
+        onClick(index:number){      
+            this.$emit("class-clicked",index)
         }
     }
 })
