@@ -72,4 +72,12 @@ export class ApiManager{
         })
         return ret as string
     }
+
+    static async writeFile(path:string,data:any){
+        await this.invoke("writeFile",{path,data})
+    }
+    static async readFile(path:string){
+        const content=await this.invoke("readFile",{path})
+        return content as string
+    }
 }

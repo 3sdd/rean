@@ -54,6 +54,16 @@ async function readImageAsBase64(event,args){
     return base64
 }
 
+async function writeFile(event,args){
+    const {path,data}=args
+    await fsPromise.writeFile(path,data)
+}
+
+async function readFile(event,args){
+    const content= await fsPromise.readFile(path,"utf-8")
+    return content
+}
+
 module.exports={
     existsPath,
     mkdir,
@@ -63,5 +73,7 @@ module.exports={
     readClasses,
     showOpenDialog,
     readdir,
-    readImageAsBase64
+    readImageAsBase64,
+    writeFile,
+    readFile
 }

@@ -51,6 +51,8 @@ import Vue from 'vue'
 import {ApiManager} from "@/utils/apiManager"
 import ClassList from "@/components/ClassList.vue"
 import ThumbnailViewer from "@/components/ThumbnailViewer.vue"
+import {AnnotationData} from "@/utils/annotationData"
+
 export default Vue.extend({
     components:{
         ClassList,
@@ -67,7 +69,8 @@ export default Vue.extend({
             rectangle:{
                 point1:{x:0,y:0},
                 point2:{x:0,y:0}
-            }
+            },
+            annotationData:null as AnnotationData|null,
         }
     },
     async mounted(){
@@ -126,9 +129,25 @@ export default Vue.extend({
     },
     methods:{
         imageSelected(index:number){
+            const previousSelectedImageIndex=this.selectedImageIndex
             this.$store.commit("project/updateSelectedImage",index)
             this.changeImage(this.selectedImageIndex)
             this.annotationCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
+
+            this.annotationData=new AnnotationData()
+
+            const annotationRootPath="./TestProject/annotations"
+            //TODO:annotationファイルの名前を 画像名.jsonにしたい
+            const annotationPath=annotationRootPath+"\\"+`annotation_${previousSelectedImageIndex}.json`
+            
+            // const annotation=JSON.stringify({
+            //     test:"test annotation"
+            // })
+            const annotation=this.annotationData?.toJson()
+            if(!this.annotationData){
+                console.error("no annotation data")
+            }
+            ApiManager.writeFile(annotationPath,annotation)
         },
         
         //canvaの画像を選択された画像に変更
@@ -198,7 +217,6 @@ export default Vue.extend({
                 this.rectangle.point1.x=x
                 this.rectangle.point1.y=y
             }
-            console.log("mousedown")
 
         },
         mouseup(e:any){
