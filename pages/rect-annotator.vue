@@ -17,6 +17,9 @@
                 <div>
                     {{projectInfo}}
                 </div>
+                <div>
+                    {{hoverBoundingBox}}
+                </div>
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
                     <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
  
@@ -38,11 +41,17 @@
                         @mouseenter="mouseenter"
                         @mouseleave="mouseleave"
                     >
-                        <g v-if="annotationData!==null">
+                        <g v-if="annotationData!==null" 
+                            @mouseenter="mouseenterSvgBoundingBox"
+                            @mouseleave="mouseleaveSvgBoundingBox"
+                            @mouseover="mouseoverSvgBoundingBox"
+                            ref="bboxContainer"
+                        >
                             <SvgBoundingBox
                                 v-for="(bbox,i) in annotationData.boundingBoxes" :key="'bbox_'+i"
                                 :xmin="bbox.xmin" :ymin="bbox.ymin" :xmax="bbox.xmax" :ymax="bbox.ymax"
                                 :showRemoveButton="true"
+ 
                                 @remove="removeBoundingBox(i)"
                             >
                             </SvgBoundingBox>
@@ -90,6 +99,7 @@ export default Vue.extend({
                 point2:{x:0,y:0}
             },
             annotationData:null as AnnotationData|null,
+            hoverBoundingBox:false,
         }
     },
     async mounted(){
@@ -203,7 +213,7 @@ export default Vue.extend({
             clear(ctx)
             const x=e.offsetX
             const y=e.offsetY
-            if(this.showDotLine){
+            if(!this.hoverBoundingBox && this.showDotLine){
                 ctx.strokeStyle="gray"
                 drawCrossLine(ctx,x,y)
             }
@@ -222,12 +232,13 @@ export default Vue.extend({
             clear(this.mainCtx)
         },
         mousedown(e:any){
-            if(!this.makingRectangle){
+            if(!this.hoverBoundingBox && !this.makingRectangle){
                 this.makingRectangle=true
                 const x=e.offsetX
                 const y=e.offsetY
                 this.rectangle.point1.x=x
                 this.rectangle.point1.y=y
+
             }
 
         },
@@ -243,7 +254,6 @@ export default Vue.extend({
 
                 this.addBox(this.rectangle.point1,this.rectangle.point2)
             }
-
         },
         addBox(point1:IPoint,point2:IPoint){
             const boundingBox=BoundingBox.fromTwoPoints(point1,point2,"")
@@ -251,6 +261,8 @@ export default Vue.extend({
         },
         removeBoundingBox(index:number){
             this.annotationData?.removeBoundingBox(index)
+            //TODO:koredeiinoka?
+            this.hoverBoundingBox=false
         },
         onClickClass(index:number){
             console.log("class clicked:"+index)
@@ -258,6 +270,18 @@ export default Vue.extend({
         },
         getBase64Images(){
             return this.imageDataList.map(x=>x.base64image)
+        },
+        mouseenterSvgBoundingBox(){
+            console.log("mouseenter")
+            this.hoverBoundingBox=true
+        },
+        mouseleaveSvgBoundingBox(){
+            console.log("mouseleave")
+            this.hoverBoundingBox=false
+        },
+        mouseoverSvgBoundingBox(){
+            console.log(" svg bbox mouseover")
+            this.hoverBoundingBox=true
         }
     }
 })
