@@ -11,6 +11,14 @@
             class="bbox-point"
         ></circle>
 
+        <rect :x="xmin" :y="ymin" fill="red" width="100" height="25"></rect>
+        <text :x="xmin" :y="ymin" font-size="15" dominant-baseline="text-before-edge"
+            fill="white"
+        >
+            {{label}}
+        </text>
+        
+
         
         <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
             rx="2" ry="2"
@@ -45,6 +53,10 @@ export default Vue.extend({
         ymax:{
             type:Number,
             required:true
+        },
+        label:{
+            type:String,
+            required:true,
         },
         showRemoveButton:{
             type:Boolean,
