@@ -38,7 +38,7 @@ export class AnnotationData{
     }
 
 
-    toJson(){
+    toJsonString(){
         const json={
             version:AnnotationData.version,
             boundingBoxes:this.boundingBoxes,
@@ -46,6 +46,16 @@ export class AnnotationData{
             imageHeight:null,//TODO:
         }
         return JSON.stringify(json,null,4)
+    }
+    static fromJsonString(json:string){
+        const j=JSON.parse(json)
+        const d= new AnnotationData()
+        console.log(j)
+        for(const bbox of j.boundingBoxes){
+            d.addBoundingBox(new BoundingBox(bbox.xmin,bbox.ymin,bbox.xmax,bbox.ymax,bbox.label))
+        }
+
+        return d
     }
 
 }

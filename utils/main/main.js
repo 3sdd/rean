@@ -60,6 +60,7 @@ async function writeFile(event,args){
 }
 
 async function readFile(event,args){
+    const {path}=args
     const content= await fsPromise.readFile(path,"utf-8")
     return content
 }

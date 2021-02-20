@@ -1,3 +1,4 @@
+import { BoundingBox } from "./annotationData"
 
 
 export function drawBox(ctx:CanvasRenderingContext2D,point1:{x:number,y:number},point2:{x:number,y:number},
@@ -12,6 +13,14 @@ export function drawBox(ctx:CanvasRenderingContext2D,point1:{x:number,y:number},
 
     ctx.lineWidth=lineWidth
     ctx.strokeRect(minX,minY,w,h)
+}
+
+export function drawBoxes(ctx:CanvasRenderingContext2D,boundingBoxes:BoundingBox[]){
+    for(const box of boundingBoxes){
+        const point1={x:box.xmin,y:box.ymin}
+        const point2={x:box.xmax,y:box.ymax}
+        drawBox(ctx,point1,point2)
+    }
 }
 
 export function clear(ctx:CanvasRenderingContext2D){
