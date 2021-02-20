@@ -46,7 +46,6 @@
                         @mouseenter="mouseenter"
                         @mouseleave="mouseleave"
                     >
-                        <circle cx="50" cy="50" r="50" fill="blue" />
                         <g v-if="annotationData!==null">
                             <SvgBoundingBox
                                 v-for="(bbox,i) in annotationData.boundingBoxes" :key="'bbox_'+i"
