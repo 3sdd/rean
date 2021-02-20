@@ -53,6 +53,8 @@ import ClassList from "@/components/ClassList.vue"
 import ThumbnailViewer from "@/components/ThumbnailViewer.vue"
 import {AnnotationData, BoundingBox} from "@/utils/annotationData"
 import {drawBox,clear,drawCrossLine, drawBoundingBoxes,drawBoundingBox} from "@/utils/drawing"
+import { ProjectInfo } from '~/utils/projectInfo'
+import {IPoint} from "@/utils/utils"
 
 export default Vue.extend({
     components:{
@@ -94,14 +96,14 @@ export default Vue.extend({
     },
     computed:{
         projectInfo(){
-            return this.$store.state.project.projectInfo
+            return this.$store.state.project.projectInfo as ProjectInfo
         },
 
         classes():string[]{
-            return this.projectInfo.classes as string[]
+            return this.projectInfo.classes
         },
         selectedImageIndex():number{
-            return this.projectInfo.selectedImageIndex as number
+            return this.projectInfo.selectedImageIndex
         },
         
         imgCtx(){
@@ -202,7 +204,6 @@ export default Vue.extend({
         },
         mouseleave(e:any){
             this.showDotLine=false
-            // this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
             clear(this.mainCtx)
         },
         mousedown(e:any){
@@ -231,7 +232,7 @@ export default Vue.extend({
             }
 
         },
-        addBox(point1:{x:number,y:number},point2:{x:number,y:number}){
+        addBox(point1:IPoint,point2:IPoint){
             const boundingBox=BoundingBox.fromTwoPoints(point1,point2,"")
             this.annotationData?.addBoundingBox(boundingBox)
         },

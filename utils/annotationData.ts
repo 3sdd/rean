@@ -1,3 +1,4 @@
+import { IPoint } from "./utils"
 
 export class BoundingBox{
     xmin:number
@@ -16,7 +17,7 @@ export class BoundingBox{
         this.label=label
     }
     
-    static fromTwoPoints(point1:{x:number,y:number},point2:{x:number,y:number},label:string){
+    static fromTwoPoints(point1:IPoint,point2:IPoint,label:string){
         const xmin=Math.min(point1.x,point2.x)
         const xmax=Math.max(point1.x,point2.x)
         const ymin=Math.min(point1.y,point2.y)
@@ -25,7 +26,7 @@ export class BoundingBox{
         return new BoundingBox(xmin,ymin,xmax,ymax,label)
     }
 
-    getFourPoints():Array<{x:number,y:number}>{
+    getFourPoints():IPoint[]{
         return [
             {x:this.xmin,y:this.ymin},//左上
             {x:this.xmax,y:this.ymin},//右上
@@ -37,7 +38,7 @@ export class BoundingBox{
 
 export class AnnotationData{
     static version="0.1"
-    boundingBoxes=[] as BoundingBox[]
+    boundingBoxes:BoundingBox[]=[]
 
     constructor(){
     }

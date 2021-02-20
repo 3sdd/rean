@@ -1,4 +1,5 @@
 import { BoundingBox } from "./annotationData"
+import { IPoint } from "./utils"
 
 
 export function drawBoundingBox(ctx:CanvasRenderingContext2D,boundingBox:BoundingBox,lineWidth=3){
@@ -30,7 +31,7 @@ export function drawBoundingBox(ctx:CanvasRenderingContext2D,boundingBox:Boundin
     }
 }
 
-export function drawBox(ctx:CanvasRenderingContext2D,point1:{x:number,y:number},point2:{x:number,y:number},
+export function drawBox(ctx:CanvasRenderingContext2D,point1:IPoint,point2:IPoint,
                             lineWidth:number=3){
     const maxX=Math.max(point1.x,point2.x)
     const minX=Math.min(point1.x,point2.x)
