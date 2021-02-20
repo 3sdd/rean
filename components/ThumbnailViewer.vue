@@ -2,6 +2,7 @@
     <div>
         <div v-for="(b64img,i) in base64images" :key="'b64img'+i"
             @click="onClick(i)"
+            class="hover:bg-blue-200"
             :class="i===selectedImageIndex?'bg-red-400':'bg-gray-900'"
         >
             <ThumbnailImage :src="b64img"
