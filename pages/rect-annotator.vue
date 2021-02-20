@@ -18,18 +18,14 @@
                     {{projectInfo}}
                 </div>
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
-                    <canvas :width="canvasWidth" :height="canvasHeight"
-                        @mousedown="mousedown"
-                        @mouseup="mouseup"
-                        @mousemove="mousemove"
-                        @mouseenter="mouseenter"
-                        @mouseleave="mouseleave"
+                    <!-- <canvas :width="canvasWidth" :height="canvasHeight"
+
                         class="absolute z-40"
-                    ></canvas>
-                    <canvas ref="annotationCanvas" :width="canvasWidth" :height="canvasHeight"
+                    ></canvas> -->
+                    <!-- <canvas ref="annotationCanvas" :width="canvasWidth" :height="canvasHeight"
                         class="absolute z-30"
                     >
-                    </canvas>
+                    </canvas> -->
                     <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
  
                         class="absolute z-20"
@@ -38,6 +34,29 @@
                         class="absolute z-10"
                     >
                     </canvas>
+                    <svg :width="canvasWidth" :height="canvasHeight"  
+                        :viewBox="`0 0 ${canvasWidth} ${canvasHeight}`" 
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="z-50"
+                        :key="selectedImageIndex"
+
+                        @mousedown="mousedown"
+                        @mouseup="mouseup"
+                        @mousemove="mousemove"
+                        @mouseenter="mouseenter"
+                        @mouseleave="mouseleave"
+                    >
+                        <circle cx="50" cy="50" r="50" fill="blue" />
+                        <g v-if="annotationData!==null">
+                            <SvgBoundingBox
+                                v-for="(bbox,i) in annotationData.boundingBoxes" :key="'bbox_'+i"
+                                :xmin="bbox.xmin" :ymin="bbox.ymin" :xmax="bbox.xmax" :ymax="bbox.ymax"
+                                :showRemoveButton="false"
+                                @click="onClickSvgBoundingBox(i)"
+                            >
+                            </SvgBoundingBox>
+                        </g>
+                    </svg>
                 </div>
             </div>
             <div class="w-48 bg-purple-600 p-2">
@@ -55,11 +74,14 @@ import {AnnotationData, BoundingBox} from "@/utils/annotationData"
 import {drawBox,clear,drawCrossLine, drawBoundingBoxes,drawBoundingBox} from "@/utils/drawing"
 import { ProjectInfo } from '~/utils/projectInfo'
 import {IPoint} from "@/utils/utils"
+import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 
 export default Vue.extend({
     components:{
         ClassList,
-        ThumbnailViewer
+        ThumbnailViewer,
+
+        SvgBoundingBox
     },
     data(){
         return {
@@ -122,14 +144,14 @@ export default Vue.extend({
             }
             return ctx
         },
-        annotationCtx(){
-            const canvas=<HTMLCanvasElement>this.$refs.annotationCanvas
-            const ctx=canvas.getContext("2d")
-            if(!ctx){
-                throw new Error("エラー:getContex('2d')")
-            }
-            return ctx
-        }
+        // annotationCtx(){
+        //     const canvas=<HTMLCanvasElement>this.$refs.annotationCanvas
+        //     const ctx=canvas.getContext("2d")
+        //     if(!ctx){
+        //         throw new Error("エラー:getContex('2d')")
+        //     }
+        //     return ctx
+        // }
     },
     methods:{
         async imageSelected(index:number){
@@ -149,7 +171,7 @@ export default Vue.extend({
 
             //次の画像に変える
             this.$store.commit("project/updateSelectedImage",index)
-            clear(this.annotationCtx)
+            // clear(this.annotationCtx)
             this.changeImage(this.selectedImageIndex)
 
             const nextAnnotationPath=annotationRootPath+"\\"+`annotation_${index}.json`
@@ -160,7 +182,7 @@ export default Vue.extend({
                 console.log("aruyo")
                 console.log(jsonString)
 
-                drawBoundingBoxes(this.annotationCtx,this.annotationData.boundingBoxes)
+                // drawBoundingBoxes(this.annotationCtx,this.annotationData.boundingBoxes)
 
             }else{
                 this.annotationData=new AnnotationData()
@@ -228,7 +250,7 @@ export default Vue.extend({
 
                 this.addBox(this.rectangle.point1,this.rectangle.point2)
                 // drawBox(this.annotationCtx,this.rectangle.point1,this.rectangle.point2)
-                drawBoundingBox(this.annotationCtx,BoundingBox.fromTwoPoints(this.rectangle.point1,this.rectangle.point2,"label"))
+                // drawBoundingBox(this.annotationCtx,BoundingBox.fromTwoPoints(this.rectangle.point1,this.rectangle.point2,"label"))
             }
 
         },
@@ -236,6 +258,9 @@ export default Vue.extend({
             const boundingBox=BoundingBox.fromTwoPoints(point1,point2,"")
             this.annotationData?.addBoundingBox(boundingBox)
         },
+        onClickSvgBoundingBox(index:number){
+            console.log("bbox clicked:"+index)
+        }
     }
 })
 </script>
