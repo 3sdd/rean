@@ -24,6 +24,15 @@ export class BoundingBox{
 
         return new BoundingBox(xmin,ymin,xmax,ymax,label)
     }
+
+    getFourPoints():Array<{x:number,y:number}>{
+        return [
+            {x:this.xmin,y:this.ymin},//左上
+            {x:this.xmax,y:this.ymin},//右上
+            {x:this.xmax,y:this.ymax},//右下
+            {x:this.xmin,y:this.ymax}//左下
+        ]
+    }
 }
 
 export class AnnotationData{

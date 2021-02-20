@@ -1,6 +1,35 @@
 import { BoundingBox } from "./annotationData"
 
 
+export function drawBoundingBox(ctx:CanvasRenderingContext2D,boundingBox:BoundingBox,lineWidth=3){
+    ctx.strokeStyle="red"
+
+    const xmin=boundingBox.xmin
+    const ymin=boundingBox.ymin
+    const xmax=boundingBox.xmax
+    const ymax=boundingBox.ymax
+
+    const w=xmax-xmin
+    const h=ymax-ymin
+
+    //矩形の線
+    ctx.lineWidth=lineWidth
+    ctx.strokeRect(xmin,ymin,w,h)
+
+    //矩形のオーバーレイ
+    ctx.fillStyle="rgba(255,0,0,0.1)"
+    ctx.fillRect(xmin,ymin,w,h)
+    
+    //端の4点の円
+    const circleSize=4
+    ctx.fillStyle="red"
+    for(const point of boundingBox.getFourPoints()){
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, circleSize,  0, Math.PI * 2, true); // 外の円
+        ctx.fill()
+    }
+}
+
 export function drawBox(ctx:CanvasRenderingContext2D,point1:{x:number,y:number},point2:{x:number,y:number},
                             lineWidth:number=3){
     const maxX=Math.max(point1.x,point2.x)
@@ -15,11 +44,9 @@ export function drawBox(ctx:CanvasRenderingContext2D,point1:{x:number,y:number},
     ctx.strokeRect(minX,minY,w,h)
 }
 
-export function drawBoxes(ctx:CanvasRenderingContext2D,boundingBoxes:BoundingBox[]){
+export function drawBoundingBoxes(ctx:CanvasRenderingContext2D,boundingBoxes:BoundingBox[]){
     for(const box of boundingBoxes){
-        const point1={x:box.xmin,y:box.ymin}
-        const point2={x:box.xmax,y:box.ymax}
-        drawBox(ctx,point1,point2)
+        drawBoundingBox(ctx,box)
     }
 }
 

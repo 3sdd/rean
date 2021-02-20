@@ -52,7 +52,7 @@ import {ApiManager} from "@/utils/apiManager"
 import ClassList from "@/components/ClassList.vue"
 import ThumbnailViewer from "@/components/ThumbnailViewer.vue"
 import {AnnotationData, BoundingBox} from "@/utils/annotationData"
-import {drawBox,clear,drawCrossLine, drawBoxes} from "@/utils/drawing"
+import {drawBox,clear,drawCrossLine, drawBoundingBoxes,drawBoundingBox} from "@/utils/drawing"
 
 export default Vue.extend({
     components:{
@@ -158,7 +158,7 @@ export default Vue.extend({
                 console.log("aruyo")
                 console.log(jsonString)
 
-                drawBoxes(this.annotationCtx,this.annotationData.boundingBoxes)
+                drawBoundingBoxes(this.annotationCtx,this.annotationData.boundingBoxes)
 
             }else{
                 this.annotationData=new AnnotationData()
@@ -226,8 +226,8 @@ export default Vue.extend({
                 this.rectangle.point2.y=y
 
                 this.addBox(this.rectangle.point1,this.rectangle.point2)
-                this.annotationCtx.strokeStyle="red"
-                drawBox(this.annotationCtx,this.rectangle.point1,this.rectangle.point2)
+                // drawBox(this.annotationCtx,this.rectangle.point1,this.rectangle.point2)
+                drawBoundingBox(this.annotationCtx,BoundingBox.fromTwoPoints(this.rectangle.point1,this.rectangle.point2,"label"))
             }
 
         },
