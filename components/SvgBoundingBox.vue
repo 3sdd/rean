@@ -11,14 +11,17 @@
             class="bbox-point"
         ></circle>
 
+        
         <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
             rx="2" ry="2"
             fill="gray"
             class="remove-button"
             @click="onClickRemoveButton"
         >
-            
         </rect>
+        <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" stroke="red" stroke-width="30" 
+            class="pointer-events-none"
+        />
     </g>
 </template>
 
@@ -73,10 +76,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-
-/* .bbox:hover>rect{
-    fill:rgba(0,255,0,0.5)
-} */
 .bbox:hover .bbox-point{
     fill:rgba(0,255,0,1);
 }
