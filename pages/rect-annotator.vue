@@ -50,8 +50,8 @@
                             <SvgBoundingBox
                                 v-for="(bbox,i) in annotationData.boundingBoxes" :key="'bbox_'+i"
                                 :xmin="bbox.xmin" :ymin="bbox.ymin" :xmax="bbox.xmax" :ymax="bbox.ymax"
-                                :showRemoveButton="false"
-                                @click="onClickSvgBoundingBox(i)"
+                                :showRemoveButton="true"
+                                @remove="removeBoundingBox(i)"
                             >
                             </SvgBoundingBox>
                         </g>
@@ -257,8 +257,8 @@ export default Vue.extend({
             const boundingBox=BoundingBox.fromTwoPoints(point1,point2,"")
             this.annotationData?.addBoundingBox(boundingBox)
         },
-        onClickSvgBoundingBox(index:number){
-            console.log("bbox clicked:"+index)
+        removeBoundingBox(index:number){
+            this.annotationData?.removeBoundingBox(index)
         }
     }
 })

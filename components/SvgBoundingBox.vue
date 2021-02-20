@@ -2,7 +2,7 @@
     <g class="bbox">
         <rect :x="xmin" :y="ymin" :width="width" :height="height" fill="rgba(255,0,0,0.4)" 
             stroke="red" stroke-width="4" stroke-dasharray="0"
-            class="bbox-fill bbox-outline"
+            class="bbox-main"
         ></rect>
         
         <circle 
@@ -11,7 +11,13 @@
             class="bbox-point"
         ></circle>
 
-        <rect v-if="showRemoveButton">
+        <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
+            rx="2" ry="2"
+            fill="gray"
+            class="remove-button"
+            @click="onClickRemoveButton"
+        >
+            
         </rect>
     </g>
 </template>
@@ -57,15 +63,28 @@ export default Vue.extend({
                 {x:this.xmin,y:this.ymax}
             ]
         },
+    },
+    methods:{
+        onClickRemoveButton(){
+            this.$emit("remove")
+        }
     }
 })
 </script>
 
 <style scoped>
 
-.bbox:hover>rect{
+/* .bbox:hover>rect{
     fill:rgba(0,255,0,0.5)
+} */
+.bbox:hover .bbox-point{
+    fill:rgba(0,255,0,1);
 }
-
-
+.bbox:hover .bbox-main{
+    fill: rgba(0,255,0,0.3);
+    stroke:rgba(0,255,0,1);
+}
+.bbox:hover .remove-button{
+    fill:rgba(0,255,0,0.3);
+}
 </style>

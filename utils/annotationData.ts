@@ -46,6 +46,9 @@ export class AnnotationData{
     addBoundingBox(boundingBox:BoundingBox):void{
         this.boundingBoxes.push(boundingBox)
     }
+    removeBoundingBox(index:number):void{
+        this.boundingBoxes.splice(index,1)
+    }
 
 
     toJsonString(){
