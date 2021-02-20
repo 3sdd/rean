@@ -2,6 +2,7 @@ const {dialog} =require("electron")
 const fs=require("fs")
 const fsPromise=require("fs").promises
 const path=require("path")
+const sizeof=require("image-size")
 
 function existsPath(event,path){
     return fs.existsSync(path)
@@ -80,9 +81,14 @@ async function readImageData(event,args){
     const buffer=await fsPromise.readFile(p)
     const base64=addPrefix(extension,buffer.toString("base64"))
 
+    //画像サイズを取得
+    const dimensions=sizeof(p)
+
     return {
         filename:filename,
-        base64image:base64
+        base64image:base64,
+        imageWidth:dimensions.width,
+        imageHeight:dimensions.height
     }
 }
 
