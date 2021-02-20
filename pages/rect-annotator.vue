@@ -51,7 +51,7 @@ import Vue from 'vue'
 import {ApiManager} from "@/utils/apiManager"
 import ClassList from "@/components/ClassList.vue"
 import ThumbnailViewer from "@/components/ThumbnailViewer.vue"
-import {AnnotationData} from "@/utils/annotationData"
+import {AnnotationData, BoundingBox} from "@/utils/annotationData"
 import {drawBox,clear,drawCrossLine} from "@/utils/drawing"
 
 export default Vue.extend({
@@ -82,6 +82,8 @@ export default Vue.extend({
 
         const imgRoot="./TestProject/images" //TODO:プロジェクトの画像フォルダーのパスに変える
         const imageFiles=await ApiManager.readdir(imgRoot)
+
+        this.annotationData=new AnnotationData()
 
         for(const imgFile of imageFiles){
             const imgPath=imgRoot+"\\"+imgFile
@@ -130,23 +132,25 @@ export default Vue.extend({
     methods:{
         imageSelected(index:number){
             const previousSelectedImageIndex=this.selectedImageIndex
-            this.$store.commit("project/updateSelectedImage",index)
-            this.changeImage(this.selectedImageIndex)
-            clear(this.annotationCtx)
-            this.annotationData=new AnnotationData()
-
-            const annotationRootPath="./TestProject/annotations"
-            //TODO:annotationファイルの名前を 画像名.jsonにしたい
-            const annotationPath=annotationRootPath+"\\"+`annotation_${previousSelectedImageIndex}.json`
-            
-            // const annotation=JSON.stringify({
-            //     test:"test annotation"
-            // })
-            const annotation=this.annotationData?.toJson()
-            if(!this.annotationData){
-                console.error("no annotation data")
+            //アノテーションデータを保存する (前の画像があるとき)
+            if(previousSelectedImageIndex!==-1){ 
+                const annotationRootPath="./TestProject/annotations"
+                //TODO:annotationファイルの名前を 画像名.jsonにしたい
+                const annotationPath=annotationRootPath+"\\"+`annotation_${previousSelectedImageIndex}.json`
+                const annotation=this.annotationData?.toJson()
+                console.log(annotation)
+                if(!this.annotationData){
+                    console.error("no annotation data")
+                }
+                ApiManager.writeFile(annotationPath,annotation)
             }
-            ApiManager.writeFile(annotationPath,annotation)
+
+            //次の画像に変える
+            
+            this.$store.commit("project/updateSelectedImage",index)
+            clear(this.annotationCtx)
+            this.changeImage(this.selectedImageIndex)
+            this.annotationData=new AnnotationData()
         },
         
         //canvaの画像を選択された画像に変更
@@ -214,8 +218,9 @@ export default Vue.extend({
             }
 
         },
-        addBox(point1:{x:number,y:number},potin2:{x:number,y:number}){
-            
+        addBox(point1:{x:number,y:number},point2:{x:number,y:number}){
+            const boundingBox=BoundingBox.fromTwoPoints(point1,point2,"")
+            this.annotationData?.addBoundingBox(boundingBox)
         },
     }
 })

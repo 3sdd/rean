@@ -15,6 +15,15 @@ export class BoundingBox{
         this.ymax=ymax
         this.label=label
     }
+    
+    static fromTwoPoints(point1:{x:number,y:number},point2:{x:number,y:number},label:string){
+        const xmin=Math.min(point1.x,point2.x)
+        const xmax=Math.max(point1.x,point2.x)
+        const ymin=Math.min(point1.y,point2.y)
+        const ymax=Math.max(point1.y,point2.y)
+
+        return new BoundingBox(xmin,ymin,xmax,ymax,label)
+    }
 }
 
 export class AnnotationData{
