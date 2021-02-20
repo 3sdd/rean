@@ -52,6 +52,7 @@ import {ApiManager} from "@/utils/apiManager"
 import ClassList from "@/components/ClassList.vue"
 import ThumbnailViewer from "@/components/ThumbnailViewer.vue"
 import {AnnotationData} from "@/utils/annotationData"
+import {drawBox,clear,drawCrossLine} from "@/utils/drawing"
 
 export default Vue.extend({
     components:{
@@ -60,7 +61,6 @@ export default Vue.extend({
     },
     data(){
         return {
-            // classes:[] as Array<string>, 
             base64images:[] as Array<string>,
             canvasWidth:800,
             canvasHeight:800,
@@ -132,8 +132,7 @@ export default Vue.extend({
             const previousSelectedImageIndex=this.selectedImageIndex
             this.$store.commit("project/updateSelectedImage",index)
             this.changeImage(this.selectedImageIndex)
-            this.annotationCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
-
+            clear(this.annotationCtx)
             this.annotationData=new AnnotationData()
 
             const annotationRootPath="./TestProject/annotations"
@@ -167,19 +166,18 @@ export default Vue.extend({
         },
         mousemove(e:any){
             const ctx=this.mainCtx
-            ctx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
-
+            clear(ctx)
             const x=e.offsetX
             const y=e.offsetY
             if(this.showDotLine){
                 ctx.strokeStyle="gray"
-                this.drawCrossLine(ctx,x,y)
+                drawCrossLine(ctx,x,y)
             }
 
             if(this.makingRectangle){
                 ctx.setLineDash([])
                 ctx.strokeStyle="black"
-                this.drawBox(ctx,this.rectangle.point1,{x,y})
+                drawBox(ctx,this.rectangle.point1,{x,y})
             }
         },
         mouseenter(e:any){
@@ -187,27 +185,8 @@ export default Vue.extend({
         },
         mouseleave(e:any){
             this.showDotLine=false
-            this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
-        },
-        drawCrossLine(ctx:CanvasRenderingContext2D, x:number,y:number){
-
-            ctx.setLineDash([5,5])
-
-            ctx.beginPath()
-            ctx.lineWidth=2
-            ctx.moveTo(x,0)
-            ctx.lineTo(x,this.canvasWidth)
-            ctx.stroke()
-            ctx.closePath()
-
-            
-            ctx.beginPath()
-            ctx.setLineDash([5,5])
-
-            ctx.moveTo(0,y)
-            ctx.lineTo(this.canvasHeight,y)
-            ctx.stroke()
-            ctx.closePath()
+            // this.mainCtx.clearRect(0,0,this.canvasWidth,this.canvasHeight)
+            clear(this.mainCtx)
         },
         mousedown(e:any){
             if(!this.makingRectangle){
@@ -231,22 +210,9 @@ export default Vue.extend({
 
                 this.addBox(this.rectangle.point1,this.rectangle.point2)
                 this.annotationCtx.strokeStyle="red"
-                this.drawBox(this.annotationCtx,this.rectangle.point1,this.rectangle.point2)
+                drawBox(this.annotationCtx,this.rectangle.point1,this.rectangle.point2)
             }
 
-        },
-        drawBox(ctx:CanvasRenderingContext2D,point1:{x:number,y:number},point2:{x:number,y:number},
-                lineWidth:number=3){
-            const maxX=Math.max(point1.x,point2.x)
-            const minX=Math.min(point1.x,point2.x)
-            const maxY=Math.max(point1.y,point2.y)
-            const minY=Math.min(point1.y,point2.y)
-
-            const w=maxX-minX
-            const h=maxY-minY
-            
-            ctx.lineWidth=lineWidth
-            ctx.strokeRect(minX,minY,w,h)
         },
         addBox(point1:{x:number,y:number},potin2:{x:number,y:number}){
             
