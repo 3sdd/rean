@@ -29,11 +29,11 @@
                         class="absolute z-20"
                     ></canvas>
 
-                    <MainImageCanas class="absolute z-10"
+                    <MainImageCanvas class="absolute z-10"
                         :canvasWidth="canvasWidth"
                         :canvasHeight="canvasHeight"
                         :base64Image="mainImageBase64"
-                    ></MainImageCanas>
+                    ></MainImageCanvas>
                     <svg :width="canvasWidth" :height="canvasHeight"  
                         :viewBox="`0 0 ${canvasWidth} ${canvasHeight}`" 
                         xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +86,7 @@ import { ProjectInfo } from '~/utils/projectInfo'
 import {IPoint} from "@/utils/utils"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { IImageData } from '~/utils/imageData'
-import MainImageCanas from "@/components/MainImageCanvas.vue"
+import MainImageCanvas from "@/components/MainImageCanvas.vue"
 
 export default Vue.extend({
     components:{
@@ -94,7 +94,7 @@ export default Vue.extend({
         ThumbnailViewer,
 
         SvgBoundingBox,
-        MainImageCanas
+        MainImageCanvas
     },
     data(){
         return {
