@@ -164,7 +164,6 @@ export default Vue.extend({
             if(previousSelectedImageIndex===index){
                 return
             }
-            console.log("previous:",previousSelectedImageIndex)
             const annotationRootPath="./TestProject/annotations"
             //アノテーションデータを保存する (前の画像があるとき)
 
@@ -185,10 +184,9 @@ export default Vue.extend({
             // clear(this.annotationCtx)
             this.changeImage(this.selectedImageIndex)
             //TODO:アノテーションファイルのパスの取得関数欲しい
-            const nextImageFilePath=this.imageDataList[index].filename
-            const nextAnnotationPath=annotationRootPath+"\\"+`${nextImageFilePath}.json`
+            const nextImageData=this.imageDataList[index]
+            const nextAnnotationPath=annotationRootPath+"\\"+`${nextImageData.filename}.json`
             const existsAnnotation=await ApiManager.existsPath(nextAnnotationPath)
-            console.log("Exists?",existsAnnotation)
             if(existsAnnotation){
                 const jsonString=await ApiManager.readFile(nextAnnotationPath)
                 this.annotationData=AnnotationData.fromJsonString(jsonString)
@@ -197,6 +195,8 @@ export default Vue.extend({
 
             }else{
                 this.annotationData=new AnnotationData()
+                this.annotationData.imageWidth=nextImageData.imageWidth
+                this.annotationData.imageHeight=nextImageData.imageHeight
             }
 
         },

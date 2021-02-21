@@ -39,7 +39,8 @@ export class BoundingBox{
 export class AnnotationData{
     static version="0.1"
     boundingBoxes:BoundingBox[]=[]
-
+    imageWidth:number|null=null//TODO:
+    imageHeight:number|null=null//TODO:
     constructor(){
     }
 
@@ -54,15 +55,17 @@ export class AnnotationData{
     toJsonString(){
         const json={
             version:AnnotationData.version,
+            imageWidth:this.imageWidth,
+            imageHeight:this.imageHeight,
             boundingBoxes:this.boundingBoxes,
-            imageWidth:null, //TODO:
-            imageHeight:null,//TODO:
         }
         return JSON.stringify(json,null,4)
     }
     static fromJsonString(json:string){
         const j=JSON.parse(json)
         const d= new AnnotationData()
+        d.imageWidth=j.imageWidth
+        d.imageHeight=j.imageHeight
         console.log(j)
         for(const bbox of j.boundingBoxes){
             d.addBoundingBox(new BoundingBox(bbox.xmin,bbox.ymin,bbox.xmax,bbox.ymax,bbox.label))
