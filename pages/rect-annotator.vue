@@ -123,8 +123,8 @@ export default Vue.extend({
             // this.base64images.push(imageData.base64image)
             this.imageDataList.push(imageData)
         }
-
-        this.imageSelected(this.selectedImageIndex)
+        //画像0番目表示
+        this.imageSelected(0)
         
     },
     computed:{
@@ -157,13 +157,18 @@ export default Vue.extend({
         },
     },
     methods:{
+        //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする
         async imageSelected(index:number){
             const previousSelectedImageIndex=this.selectedImageIndex
+            //前の選択画像と次に選択したものが同じものならなにもしない
+            if(previousSelectedImageIndex===index){
+                return
+            }
+            console.log("previous:",previousSelectedImageIndex)
             const annotationRootPath="./TestProject/annotations"
             //アノテーションデータを保存する (前の画像があるとき)
-            
 
-            if(previousSelectedImageIndex!==-1){ 
+            if(previousSelectedImageIndex!==-1){  //前の選択画像があるとき
                 //TODO:アノテーションファイルのパスの取得関数欲しい
                 const filename=this.imageDataList[previousSelectedImageIndex].filename
                 const annotationPath=annotationRootPath+"\\"+`${filename}.json`
@@ -180,9 +185,10 @@ export default Vue.extend({
             // clear(this.annotationCtx)
             this.changeImage(this.selectedImageIndex)
             //TODO:アノテーションファイルのパスの取得関数欲しい
-            const previousImageFilename=this.imageDataList[index].filename
-            const nextAnnotationPath=annotationRootPath+"\\"+`${previousImageFilename}.json`
+            const nextImageFilePath=this.imageDataList[index].filename
+            const nextAnnotationPath=annotationRootPath+"\\"+`${nextImageFilePath}.json`
             const existsAnnotation=await ApiManager.existsPath(nextAnnotationPath)
+            console.log("Exists?",existsAnnotation)
             if(existsAnnotation){
                 const jsonString=await ApiManager.readFile(nextAnnotationPath)
                 this.annotationData=AnnotationData.fromJsonString(jsonString)

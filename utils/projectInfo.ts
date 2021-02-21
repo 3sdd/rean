@@ -4,7 +4,7 @@ export class ProjectInfo{
     location:string
 
     classes:string[]=[]
-    selectedImageIndex:number=0
+    selectedImageIndex:number=-1
 
     constructor(projectName:string,location:string){
         this.projectName=projectName
