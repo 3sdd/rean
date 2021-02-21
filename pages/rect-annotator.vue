@@ -98,7 +98,6 @@ export default Vue.extend({
     },
     data(){
         return {
-            // base64images:[] as Array<string>,
             imageDataList:[] as Array<IImageData>,
             canvasWidth:800,
             canvasHeight:800,
@@ -131,7 +130,7 @@ export default Vue.extend({
             const imgPath=imgRoot+"\\"+imgFile
             const imageData=await ApiManager.readImageData(imgPath)
             console.log(imageData)
-            // this.base64images.push(imageData.base64image)
+
             this.imageDataList.push(imageData)
         }
         //画像0番目表示
@@ -150,14 +149,6 @@ export default Vue.extend({
             return this.projectInfo.selectedImageIndex
         },
         
-        imgCtx(){
-            const canvas=<HTMLCanvasElement>this.$refs.imageCanvas
-            const ctx=canvas.getContext("2d")
-            if(!ctx){
-                throw new Error("エラー:getContex('2d')")
-            }
-            return ctx
-        },
         mainCtx(){
             const canvas=<HTMLCanvasElement>this.$refs.mainCanvas
             const ctx=canvas.getContext("2d")
@@ -192,7 +183,7 @@ export default Vue.extend({
 
             //次の画像に変える
             this.$store.commit("project/updateSelectedImage",index)
-            // clear(this.annotationCtx)
+
             this.changeImage(this.selectedImageIndex)
             //TODO:アノテーションファイルのパスの取得関数欲しい
             const nextImageData=this.imageDataList[index]
@@ -215,18 +206,6 @@ export default Vue.extend({
         //canvaの画像を選択された画像に変更
         changeImage(index:number){
             this.mainImageBase64=this.imageDataList[index].base64image
-            // const ctx=this.imgCtx
-
-            // const base64image=this.imageDataList[index].base64image
-
-            // const image=new Image()
-            // const width=this.canvasWidth
-            // const height=this.canvasHeight
-            // image.onload=(e)=>{
-            //     //TODO:変形されてる?
-            //     ctx.drawImage(image,0,0,width,height)
-            // }
-            // image.src=base64image
         },
         mousemove(e:MouseEvent){
             const ctx=this.mainCtx
