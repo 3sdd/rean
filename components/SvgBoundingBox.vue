@@ -29,7 +29,7 @@
         <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
             rx="2" ry="2"
             fill="gray"
-            class="remove-button"
+            class="remove-button cursor-pointer"
             @click="onClickRemoveButton"
         >
         </rect>
