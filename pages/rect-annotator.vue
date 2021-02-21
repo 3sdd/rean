@@ -58,6 +58,7 @@
                                 :showRemoveButton="true"
                                 @click-bounding-box="clickBoundingBox(i)"
                                 @remove="removeBoundingBox(i)"
+                                @start-scale="startScaling(i,$event)"
                             >
                             </SvgBoundingBox>
                         </g>
@@ -106,6 +107,7 @@ export default Vue.extend({
             annotationData:null as AnnotationData|null,
             hoverBoundingBox:false,
             selectedBoundingBox:-1,//-1は選択されていない状態。
+            scaling:false,
         }
     },
     async mounted(){
@@ -220,7 +222,7 @@ export default Vue.extend({
             }
             image.src=base64image
         },
-        mousemove(e:any){
+        mousemove(e:MouseEvent){
             const ctx=this.mainCtx
             clear(ctx)
             const x=e.offsetX
@@ -234,16 +236,18 @@ export default Vue.extend({
                 ctx.setLineDash([])
                 ctx.strokeStyle="black"
                 drawBox(ctx,this.rectangle.point1,{x,y})
+            }else if(this.scaling){
+                console.log("P scaling")
             }
         },
-        mouseenter(e:any){
+        mouseenter(e:MouseEvent){
             this.showDotLine=true
         },
-        mouseleave(e:any){
+        mouseleave(e:MouseEvent){
             this.showDotLine=false
             clear(this.mainCtx)
         },
-        mousedown(e:any){
+        mousedown(e:MouseEvent){
             if(!this.hoverBoundingBox && !this.makingRectangle){
                 this.makingRectangle=true
                 const x=e.offsetX
@@ -254,7 +258,7 @@ export default Vue.extend({
             }
 
         },
-        mouseup(e:any){
+        mouseup(e:MouseEvent){
             console.log("mouseup")
             if(this.makingRectangle){
                 this.makingRectangle=false
@@ -269,6 +273,8 @@ export default Vue.extend({
                 if(numBboxes){
                     this.selectedBoundingBox=numBboxes-1 //最後を選択
                 }
+            }else if(this.scaling){
+                this.scaling=false
             }
         },
         addBox(point1:IPoint,point2:IPoint){
@@ -312,7 +318,12 @@ export default Vue.extend({
         mouseoverSvgBoundingBox(){
             console.log(" svg bbox mouseover")
             this.hoverBoundingBox=true
-        }
+        },
+        startScaling(index:number,e:any){
+            console.log("parent s")
+            console.log(index)
+            console.log(e)
+        },
     }
 })
 </script>

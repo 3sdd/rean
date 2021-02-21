@@ -1,21 +1,19 @@
 <template>
     <g class="bbox cursor-move"
-        @mousedown="startDrag"
-        @mouseup="endDrag"
-        @mousemove="drag"
-        @mouseleave="endDrag"
-        @click="click"
+
     >
         <rect :x="xmin" :y="ymin" :width="width" :height="height" fill="rgba(255,0,0,0.4)" 
             stroke="red" stroke-width="4" stroke-dasharray="0"
             class="bbox-main"
+            @mousedown="startDrag"
+            @mouseup="endDrag"
+            @mousemove="drag"
+            @mouseleave="endDrag"
+            @click="clickBoundingBox"
+
         ></rect>
         
-        <circle 
-            v-for="(point,i) in fourPoints" :key="i"
-            :cx="point.x" :cy="point.y" r="5" fill="red"
-            class="bbox-point"
-        ></circle>
+
 
         <rect :x="xmin" :y="ymin" fill="red" width="100" height="25"></rect>
         <text :x="xmin" :y="ymin" font-size="15" dominant-baseline="text-before-edge"
@@ -23,14 +21,39 @@
         >
             {{label}}
         </text>
-        
 
+        <line :x1="xmin" :y1="ymin" :x2="xmin" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+            class="cursor-left"
+            @mousedown="startScaling('right-left')"
+        ></line>
+        <line :x1="xmin" :y1="ymin" :x2="xmax" :y2="ymin" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+            class="cursor-up"
+            @mousedown="startScaling('up-down')"
+        ></line>
+        <line :x1="xmax" :y1="ymin" :x2="xmax" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+            class="cursor-right"
+            @mousedown="startScaling('right-left')"
+        ></line>
+        <line :x1="xmax" :y1="ymax" :x2="xmin" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+            class="cursor-down"
+            @mousedown="startScaling('up-down')"
+        ></line>
+
+        <circle 
+            v-for="(point,i) in fourPoints" :key="i"
+            :cx="point.x" :cy="point.y" r="5" fill="red"
+            class="bbox-point"
+            :class="circleClass(i)"
+            @mousedown="startScaling(getScaleMode('circle',i))"
+            @mouseup="finishScalingBoundingBox(i)"
+        ></circle>
         
         <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
             rx="2" ry="2"
             fill="gray"
             class="remove-button cursor-pointer"
             @click="onClickRemoveButton"
+            
         >
         </rect>
         <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" stroke="red" stroke-width="30" 
@@ -71,7 +94,7 @@ export default Vue.extend({
     },
     data(){
         return {
-            dragged:false
+            dragged:false,
         }
     },
     computed:{
@@ -89,6 +112,20 @@ export default Vue.extend({
                 {x:this.xmin,y:this.ymax}
             ]
         },
+        circleClass(){
+            return function(i:number){
+                switch(i){
+                    case 0:
+                    case 2:
+                        return "cursor-nwse"
+                    case 1:
+                    case 3:
+                        return "cursor-nesw"
+                    default:
+                        return ""
+                }
+            }
+        }
     },
     methods:{
         onClickRemoveButton(){
@@ -117,8 +154,35 @@ export default Vue.extend({
                 this.$emit("update:ymax",this.ymax+dragY)
             }
         },
-        click(){
+        clickBoundingBox(){
             this.$emit("click-bounding-box")
+        },
+        startScalingBoundingBox(index:number){
+            console.log("SCALE start")
+            this.$emit("start:scale")
+        },
+        finishScalingBoundingBox(index:number){
+            console.log("SCALE finished")
+            this.$emit("finish:scale")
+        },
+        startScaling(mode:"up-down"|"right-left"|"upper-right-lower-left"|"upper-left-lower-right"){
+            console.log(mode)
+            this.$emit("start-scale",mode)
+        },
+        getScaleMode(s:"circle",index:number){
+            if(s==="circle"){
+                switch(index){
+                    case 0:
+                    case 2:
+                        return "upper-left-lower-right"
+                    case 1:
+                    case 3:
+                        return "upper-right-lower-left"
+                    default:
+                        throw new Error("not found scale mode")
+                    
+                }
+            }
         }
     }
 })
@@ -134,5 +198,24 @@ export default Vue.extend({
 }
 .bbox:hover .remove-button{
     fill:rgba(0,255,0,0.3);
+}
+
+.cursor-nwse{
+    cursor: nwse-resize ;
+}
+.cursor-nesw{
+    cursor: nesw-resize;
+}
+.cursor-left{
+    cursor: e-resize;
+}
+.cursor-up{
+    cursor: n-resize;
+}
+.cursor-right{
+    cursor: w-resize;
+}
+.cursor-down{
+    cursor: s-resize;
 }
 </style>
