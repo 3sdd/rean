@@ -49,7 +49,8 @@
                         >
                             <SvgBoundingBox
                                 v-for="(bbox,i) in annotationData.boundingBoxes" :key="'bbox_'+i"
-                                :xmin="bbox.xmin" :ymin="bbox.ymin" :xmax="bbox.xmax" :ymax="bbox.ymax"
+                                :xmin.sync="bbox.xmin" :ymin.sync="bbox.ymin" 
+                                :xmax.sync="bbox.xmax" :ymax.sync="bbox.ymax"
                                 :label="bbox.label"
                                 :showRemoveButton="true"
  

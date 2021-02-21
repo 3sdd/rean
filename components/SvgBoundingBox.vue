@@ -1,5 +1,10 @@
 <template>
-    <g class="bbox">
+    <g class="bbox cursor-move"
+        @mousedown="startDrag"
+        @mouseup="endDrag"
+        @mousemove="drag"
+        @mouseleave="endDrag"
+    >
         <rect :x="xmin" :y="ymin" :width="width" :height="height" fill="rgba(255,0,0,0.4)" 
             stroke="red" stroke-width="4" stroke-dasharray="0"
             class="bbox-main"
@@ -63,6 +68,11 @@ export default Vue.extend({
             required:true,
         }
     },
+    data(){
+        return {
+            dragged:false
+        }
+    },
     computed:{
         width(){
             return <number>this.xmax-<number>this.xmin
@@ -82,6 +92,29 @@ export default Vue.extend({
     methods:{
         onClickRemoveButton(){
             this.$emit("remove")
+        },
+        startDrag(event:MouseEvent){
+            console.log("start drag")
+            this.dragged=true
+            
+        },
+        endDrag(event:MouseEvent){
+            console.log("end drag")
+            this.dragged=false
+        },
+        drag(event:MouseEvent){
+            console.log("drag")
+            if(this.dragged){
+                event.preventDefault()
+                const dragX=event.movementX
+                const dragY=event.movementY
+                
+                //移動
+                this.$emit("update:xmin",this.xmin+dragX)
+                this.$emit("update:xmax",this.xmax+dragX)
+                this.$emit("update:ymin",this.ymin+dragY)
+                this.$emit("update:ymax",this.ymax+dragY)
+            }
         }
     }
 })
