@@ -4,6 +4,7 @@
         @mouseup="endDrag"
         @mousemove="drag"
         @mouseleave="endDrag"
+        @click="click"
     >
         <rect :x="xmin" :y="ymin" :width="width" :height="height" fill="rgba(255,0,0,0.4)" 
             stroke="red" stroke-width="4" stroke-dasharray="0"
@@ -115,6 +116,9 @@ export default Vue.extend({
                 this.$emit("update:ymin",this.ymin+dragY)
                 this.$emit("update:ymax",this.ymax+dragY)
             }
+        },
+        click(){
+            this.$emit("click-bounding-box")
         }
     }
 })

@@ -51,6 +51,15 @@ export class AnnotationData{
         this.boundingBoxes.splice(index,1)
     }
 
+    setLabel(boundingBoxIndex:number,label:string){
+        //範囲外
+        if(boundingBoxIndex<0 || boundingBoxIndex>=this.boundingBoxes.length){
+            console.error(`out of index: bbox index:${boundingBoxIndex} ,bbox indexは0<= bbox index<=:${this.boundingBoxes.length-1}の範囲`)
+            return
+        }
+        this.boundingBoxes[boundingBoxIndex].label=label
+    }
+
 
     toJsonString(){
         const json={

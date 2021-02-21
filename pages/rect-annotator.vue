@@ -20,6 +20,9 @@
                 <div>
                     {{hoverBoundingBox}}
                 </div>
+                <div>
+                    {{selectedBoundingBox}}
+                </div>
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
                     <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
  
@@ -53,7 +56,7 @@
                                 :xmax.sync="bbox.xmax" :ymax.sync="bbox.ymax"
                                 :label="bbox.label"
                                 :showRemoveButton="true"
- 
+                                @click-bounding-box="clickBoundingBox(i)"
                                 @remove="removeBoundingBox(i)"
                             >
                             </SvgBoundingBox>
@@ -102,6 +105,7 @@ export default Vue.extend({
             },
             annotationData:null as AnnotationData|null,
             hoverBoundingBox:false,
+            selectedBoundingBox:-1,//-1は選択されていない状態。
         }
     },
     async mounted(){
@@ -261,6 +265,10 @@ export default Vue.extend({
                 this.rectangle.point2.y=y
 
                 this.addBox(this.rectangle.point1,this.rectangle.point2)
+                const numBboxes=this.annotationData?.boundingBoxes?.length
+                if(numBboxes){
+                    this.selectedBoundingBox=numBboxes-1 //最後を選択
+                }
             }
         },
         addBox(point1:IPoint,point2:IPoint){
@@ -269,12 +277,26 @@ export default Vue.extend({
         },
         removeBoundingBox(index:number){
             this.annotationData?.removeBoundingBox(index)
+            if(this.selectedBoundingBox===index){
+                console.log("kessarete")
+                this.selectedBoundingBox=-1
+            }
             //TODO:koredeiinoka?
             this.hoverBoundingBox=false
+        },
+        clickBoundingBox(index:number){
+            this.selectedBoundingBox=index
+            console.log("selected bounding box index:"+this.selectedBoundingBox)
         },
         onClickClass(index:number){
             console.log("class clicked:"+index)
             console.log(this.classes[index])
+            const bboxIndex=this.selectedBoundingBox
+            if(bboxIndex<0){
+                return
+            }
+            
+            this.annotationData?.setLabel(bboxIndex,this.classes[index])
         },
         getBase64Images(){
             return this.imageDataList.map(x=>x.base64image)
