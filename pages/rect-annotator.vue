@@ -4,7 +4,7 @@
         <div class="p-2 bg-blue-200">
             <p>残り枚数 10000枚</p>
         </div>
-        <div class="flex-1 flex flex-row bg-blue-400">
+        <div class="flex-1 flex flex-row bg-blue-400 ">
             <div class="w-40 h-ful overflow-y-auto">
                 <ThumbnailViewer 
                     :base64images="getBase64Images()"
@@ -28,10 +28,12 @@
  
                         class="absolute z-20"
                     ></canvas>
-                    <canvas ref="imageCanvas" :width="canvasWidth" :height="canvasHeight"
-                        class="absolute z-10"
-                    >
-                    </canvas>
+
+                    <MainImageCanas class="absolute z-10"
+                        :canvasWidth="canvasWidth"
+                        :canvasHeight="canvasHeight"
+                        :base64Image="mainImageBase64"
+                    ></MainImageCanas>
                     <svg :width="canvasWidth" :height="canvasHeight"  
                         :viewBox="`0 0 ${canvasWidth} ${canvasHeight}`" 
                         xmlns="http://www.w3.org/2000/svg"
@@ -84,13 +86,15 @@ import { ProjectInfo } from '~/utils/projectInfo'
 import {IPoint} from "@/utils/utils"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { IImageData } from '~/utils/imageData'
+import MainImageCanas from "@/components/MainImageCanvas.vue"
 
 export default Vue.extend({
     components:{
         ClassList,
         ThumbnailViewer,
 
-        SvgBoundingBox
+        SvgBoundingBox,
+        MainImageCanas
     },
     data(){
         return {
@@ -98,6 +102,7 @@ export default Vue.extend({
             imageDataList:[] as Array<IImageData>,
             canvasWidth:800,
             canvasHeight:800,
+            mainImageBase64:"",
             showDotLine:false,
             makingRectangle:false,
             rectangle:{
@@ -209,18 +214,19 @@ export default Vue.extend({
         
         //canvaの画像を選択された画像に変更
         changeImage(index:number){
-            const ctx=this.imgCtx
+            this.mainImageBase64=this.imageDataList[index].base64image
+            // const ctx=this.imgCtx
 
-            const base64image=this.imageDataList[index].base64image
+            // const base64image=this.imageDataList[index].base64image
 
-            const image=new Image()
-            const width=this.canvasWidth
-            const height=this.canvasHeight
-            image.onload=(e)=>{
-                //TODO:変形されてる?
-                ctx.drawImage(image,0,0,width,height)
-            }
-            image.src=base64image
+            // const image=new Image()
+            // const width=this.canvasWidth
+            // const height=this.canvasHeight
+            // image.onload=(e)=>{
+            //     //TODO:変形されてる?
+            //     ctx.drawImage(image,0,0,width,height)
+            // }
+            // image.src=base64image
         },
         mousemove(e:MouseEvent){
             const ctx=this.mainCtx
