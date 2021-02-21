@@ -9,7 +9,7 @@
                 <ThumbnailViewer 
                     :base64images="getBase64Images()"
                     :selectedImageIndex="selectedImageIndex"
-                    @image-selected="imageSelected"
+                    @image-clicked="imageSelected"
                 >
                 </ThumbnailViewer>
             </div>

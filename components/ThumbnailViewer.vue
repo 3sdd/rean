@@ -34,7 +34,7 @@ export default Vue.extend({
     },
     methods:{
         onClick(index:number){
-            this.$emit("image-selected",index)
+            this.$emit("image-clicked",index)
         }
     }
 })
