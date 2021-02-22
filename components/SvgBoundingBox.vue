@@ -1,7 +1,7 @@
 <template>
     <g class="bbox cursor-move">
-        <rect :x="xmin" :y="ymin" :width="width" :height="height" fill="rgba(255,0,0,0.4)" 
-            stroke="red" stroke-width="4" stroke-dasharray="0"
+        <rect :x="xmin" :y="ymin" :width="width" :height="height" :fill="transparentColor" 
+            :stroke="color" stroke-width="4" stroke-dasharray="0"
             class="bbox-main"
             @mousedown="startDrag"
             @mouseup="endDrag"
@@ -10,33 +10,43 @@
             @click="clickBoundingBox"
         ></rect>
 
-        <rect :x="xmin" :y="ymin" fill="red" width="100" height="25"></rect>
+        <rect :x="xmin" :y="ymin" :fill="color" width="100" height="25" 
+            class="rect-label"
+        ></rect>
         <text :x="xmin" :y="ymin" font-size="15" dominant-baseline="text-before-edge"
             fill="white"
         >
             {{label}}
         </text>
 
-        <line :x1="xmin" :y1="ymin" :x2="xmin" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+        <line :x1="xmin" :y1="ymin" :x2="xmin" :y2="ymax"
+            :stroke="lineStroke" 
+            stroke-width="10"
             class="cursor-left"
             @mousedown="startScaling('left')"
         ></line>
-        <line :x1="xmin" :y1="ymin" :x2="xmax" :y2="ymin" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+        <line :x1="xmin" :y1="ymin" :x2="xmax" :y2="ymin" 
+            :stroke="lineStroke" 
+            stroke-width="10"
             class="cursor-up"
             @mousedown="startScaling('up')"
         ></line>
-        <line :x1="xmax" :y1="ymin" :x2="xmax" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+        <line :x1="xmax" :y1="ymin" :x2="xmax" :y2="ymax" 
+            :stroke="lineStroke" 
+            stroke-width="10"
             class="cursor-right"
             @mousedown="startScaling('right')"
         ></line>
-        <line :x1="xmax" :y1="ymax" :x2="xmin" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
+        <line :x1="xmax" :y1="ymax" :x2="xmin" :y2="ymax" 
+            :stroke="lineStroke" 
+            stroke-width="10"
             class="cursor-down"
             @mousedown="startScaling('down')"
         ></line>
 
         <circle 
             v-for="(point,i) in fourPoints" :key="i"
-            :cx="point.x" :cy="point.y" r="5" fill="red"
+            :cx="point.x" :cy="point.y" r="5" :fill="color"
             class="bbox-point"
             :class="circleClass(i)"
             @mousedown="startScaling(getCircleScaleMode(i))"
@@ -52,7 +62,7 @@
                 
             >
             </rect>
-            <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" stroke="red" stroke-width="30" 
+            <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" :stroke="color" stroke-width="30" 
                 class="pointer-events-none"
             />
         </g>
@@ -99,6 +109,9 @@ export default Vue.extend({
     data(){
         return {
             dragged:false,
+            color:"rgba(100,100,100,1)",
+            transparentColor:"rgba(100,100,100,0.2)",
+            lineStroke:"rgba(0,0,255,0.0)"
         }
     },
     computed:{
@@ -202,6 +215,9 @@ export default Vue.extend({
 }
 .bbox:hover .remove-button{
     fill:rgba(0,255,0,0.3);
+}
+.bbox:hover .rect-label{
+    fill:rgba(0,255,0,1);
 }
 
 .cursor-nwse{
