@@ -123,6 +123,7 @@ export default Vue.extend({
             mouseY:0,
 
             makingRectangle:false,
+            defaultLabel:"",
 
             rectangle:{
                 point1:{x:0,y:0},
@@ -325,7 +326,7 @@ export default Vue.extend({
             }
         },
         addBox(point1:IPoint,point2:IPoint){
-            const boundingBox=BoundingBox.fromTwoPoints(point1,point2,"テストラベル")
+            const boundingBox=BoundingBox.fromTwoPoints(point1,point2,this.defaultLabel)
             this.annotationData?.addBoundingBox(boundingBox)
         },
         removeBoundingBox(index:number){
