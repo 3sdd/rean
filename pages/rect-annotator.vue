@@ -4,8 +4,8 @@
         <div class="p-2 bg-blue-200">
             <p>残り枚数 10000枚</p>
         </div>
-        <div class="flex-1 flex flex-row bg-blue-400 h-full">
-            <div class="w-40 h-ful overflow-y-auto p-1">
+        <div class="flex-1 flex flex-row bg-blue-400 overflow-y-auto">
+            <div class="w-60 overflow-y-auto p-1">
                 <div class="mx-auto text-center font-bold text-white mb-5">
                     
                 </div>
@@ -24,9 +24,11 @@
                     {{hoverBoundingBox}}
                 </div>
                 <div>
-                    {{selectedBoundingBox}}
+                    {{annotationAreaWidth}},{{annotationAreaHeight}}
                 </div>
-                <div class="bg-green-300 flex justify-center items-center relative">
+                <div class="bg-green-300 flex justify-center items-center relative"
+                    ref="annotation-working-area"
+                >
                     <MainImageCanvas 
                         class="absolute z-10 pointer-events-none"
                         :canvasWidth="canvasWidth"
@@ -114,9 +116,12 @@ export default Vue.extend({
     data(){
         return {
             imageDataList:[] as Array<IImageData>,
-            canvasWidth:800,
-            canvasHeight:800,
+            canvasWidth:700,
+            canvasHeight:700,
             mainImageBase64:"",
+
+            areaWidth:0,
+            areaHeight:0,
 
             showDotLine:false,
             mouseX:0,
@@ -184,6 +189,24 @@ export default Vue.extend({
         selectedImageIndex():number{
             return this.projectInfo.selectedImageIndex
         },
+        annotationAreaWidth(){
+            const a=this.$refs["annotation-working-area"] as HTMLElement
+            console.log(this.$refs)
+            if(!a){
+                console.log("NOT A")
+                return 0
+            }
+            console.log(a)
+            return a.offsetWidth
+        },
+        annotationAreaHeight(){
+            const a=this.$refs["annotation-working-area"] as HTMLElement
+            if(!a){
+                console.log("NOT A")
+                return 0
+            }
+            return a.offsetHeight
+        }
     },
     methods:{
         //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする

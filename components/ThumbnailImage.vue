@@ -1,9 +1,7 @@
 <template>
     <div>
         <img :src="src"
-            class="p-2 h-40 w-full"
-            width=""
-            height="100px"
+            class="p-2 h-40 w-full object-contain"
         />
     </div>
 </template>
