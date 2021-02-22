@@ -24,12 +24,17 @@
                     {{selectedBoundingBox}}
                 </div>
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
-                    <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
+                    <!-- <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
  
                         class="absolute z-20"
-                    ></canvas>
-
-                    <MainImageCanvas class="absolute z-10"
+                    ></canvas> -->
+                    <!-- <AuxiliaryLinesCanvas
+                        class="absolute z-20"
+                        :canvasWidth="canvasWidth"
+                        :canvasHeight="canvasHeight"
+                    ></AuxiliaryLinesCanvas> -->
+                    <MainImageCanvas 
+                        class="absolute z-10 pointer-events-none"
                         :canvasWidth="canvasWidth"
                         :canvasHeight="canvasHeight"
                         :base64Image="mainImageBase64"
@@ -46,6 +51,11 @@
                         @mouseenter="mouseenter"
                         @mouseleave="mouseleave"
                     >
+                        <SvgCrossLine class="cursor-event-none"
+                            :cx="mouseX" :cy="mouseY"
+                            :width="canvasWidth" :height="canvasHeight"
+                            :show="showDotLine"
+                        ></SvgCrossLine>
                         <g v-if="annotationData!==null" 
                             @mouseenter="mouseenterSvgBoundingBox"
                             @mouseleave="mouseleaveSvgBoundingBox"
@@ -87,6 +97,8 @@ import {IPoint} from "@/utils/utils"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { IImageData } from '~/utils/imageData'
 import MainImageCanvas from "@/components/MainImageCanvas.vue"
+import AuxiliaryLinesCanvas from "@/components/AuxiliaryLinesCanvas.vue"
+import SvgCrossLine from "@/components/SvgCrossLine.vue"
 
 export default Vue.extend({
     components:{
@@ -94,7 +106,9 @@ export default Vue.extend({
         ThumbnailViewer,
 
         SvgBoundingBox,
-        MainImageCanvas
+        MainImageCanvas,
+        AuxiliaryLinesCanvas,
+        SvgCrossLine
     },
     data(){
         return {
@@ -102,7 +116,11 @@ export default Vue.extend({
             canvasWidth:800,
             canvasHeight:800,
             mainImageBase64:"",
+
             showDotLine:false,
+            mouseX:0,
+            mouseY:0,
+
             makingRectangle:false,
             rectangle:{
                 point1:{x:0,y:0},
@@ -149,14 +167,14 @@ export default Vue.extend({
             return this.projectInfo.selectedImageIndex
         },
         
-        mainCtx(){
-            const canvas=<HTMLCanvasElement>this.$refs.mainCanvas
-            const ctx=canvas.getContext("2d")
-            if(!ctx){
-                throw new Error("エラー:getContex('2d')")
-            }
-            return ctx
-        },
+        // mainCtx(){
+        //     const canvas=<HTMLCanvasElement>this.$refs.mainCanvas
+        //     const ctx=canvas.getContext("2d")
+        //     if(!ctx){
+        //         throw new Error("エラー:getContex('2d')")
+        //     }
+        //     return ctx
+        // },
     },
     methods:{
         //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする
@@ -208,29 +226,32 @@ export default Vue.extend({
             this.mainImageBase64=this.imageDataList[index].base64image
         },
         mousemove(e:MouseEvent){
-            const ctx=this.mainCtx
-            clear(ctx)
-            const x=e.offsetX
-            const y=e.offsetY
-            if(!this.hoverBoundingBox && this.showDotLine){
-                ctx.strokeStyle="gray"
-                drawCrossLine(ctx,x,y)
-            }
+            // const ctx=this.mainCtx
+            // clear(ctx)
+            // const x=e.offsetX
+            // const y=e.offsetY
+            // if(!this.hoverBoundingBox && this.showDotLine){
+            //     ctx.strokeStyle="gray"
+            //     drawCrossLine(ctx,x,y)
+            // }
 
-            if(this.makingRectangle){
-                ctx.setLineDash([])
-                ctx.strokeStyle="black"
-                drawBox(ctx,this.rectangle.point1,{x,y})
-            }else if(this.scaling){
-                console.log("P scaling")
-            }
+            // if(this.makingRectangle){
+            //     ctx.setLineDash([])
+            //     ctx.strokeStyle="black"
+            //     drawBox(ctx,this.rectangle.point1,{x,y})
+            // }else if(this.scaling){
+            //     console.log("P scaling")
+            // }
+            this.mouseX=e.offsetX
+            this.mouseY=e.offsetY
         },
         mouseenter(e:MouseEvent){
+            console.log("sho")
             this.showDotLine=true
         },
         mouseleave(e:MouseEvent){
             this.showDotLine=false
-            clear(this.mainCtx)
+            // clear(this.mainCtx)
         },
         mousedown(e:MouseEvent){
             if(!this.hoverBoundingBox && !this.makingRectangle){
