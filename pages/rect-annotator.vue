@@ -138,14 +138,10 @@ export default Vue.extend({
         }
     },
     async mounted(){
-        let rootPath=this.$store.state.project.projectInfo.location
 
-        const _useTestProject=false
-        if(_useTestProject){
-            rootPath="./TestProject"
-        }
-        const classFilePath:string =rootPath+"\\"+"classes.txt"
-        const imgRoot:string =rootPath+"\\"+"images"
+
+        const classFilePath:string =this.rootPath+"\\"+"classes.txt"
+        const imgRoot:string =this.rootPath+"\\"+"images"
 
         const classes=await ApiManager.readClasses(classFilePath)
         this.$store.commit("project/loadClasses",classes)
@@ -171,7 +167,13 @@ export default Vue.extend({
         projectInfo(){
             return this.$store.state.project.projectInfo as ProjectInfo
         },
-
+        rootPath(){
+            const _useTestProject=false
+            if(_useTestProject){
+                return "./TestProject"
+            }
+            return (this.$store.state.project.projectInfo as ProjectInfo).location
+        },
         classes():string[]{
             return this.projectInfo.classes
         },
@@ -187,7 +189,8 @@ export default Vue.extend({
             if(previousSelectedImageIndex===index){
                 return
             }
-            const annotationRootPath="./TestProject/annotations"
+            const annotationRootPath=this.projectInfo.location+"\\"+"annotations"
+            
             //アノテーションデータを保存する (前の画像があるとき)
 
             if(previousSelectedImageIndex!==-1){  //前の選択画像があるとき
