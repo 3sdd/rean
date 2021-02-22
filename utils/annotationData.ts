@@ -59,6 +59,11 @@ export class AnnotationData{
         }
         this.boundingBoxes[boundingBoxIndex].label=label
     }
+    
+    //引数のlabelと一致するbounding boxを返す
+    findBoundingBoxes(label:string){
+        return this.boundingBoxes.filter(x=>x.label===label)
+    }
 
 
     toJsonString(){

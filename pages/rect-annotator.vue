@@ -201,14 +201,25 @@ export default Vue.extend({
                 //TODO:アノテーションファイルのパスの取得関数欲しい
                 const filename=this.imageDataList[previousSelectedImageIndex].filename
                 const annotationPath=annotationRootPath+"\\"+`${filename}.json`
+                //アノテーションのフォルダがない時はアラートを表示する
                 if(! (await ApiManager.existsPath(annotationRootPath))){
                     alert("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
                     return
                 }
                 const annotation=this.annotationData?.toJsonString()
                 console.log(annotation)
-                if(!this.annotationData){
+                if(this.annotationData===null){
                     console.error("no annotation data")
+                }
+                //ラベルを付けていないbounding boxがあるときはアラートを表示する
+                if(this.annotationData){
+                    const existsNoLabelBoundingBox=this.annotationData
+                        .findBoundingBoxes(this.defaultLabel).length >0
+                    if(existsNoLabelBoundingBox){
+                        alert("ラベルを付けていないBounding Boxが存在します。\nラベルを付けてください")
+                        return
+                    }
+
                 }
                 ApiManager.writeFile(annotationPath,annotation)
             }
