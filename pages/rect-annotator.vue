@@ -138,13 +138,20 @@ export default Vue.extend({
         }
     },
     async mounted(){
-        const path="./TestProject/classes.txt" //TODO:プロジェクトのclassファイルに変える
-        const classes=await ApiManager.readClasses(path)
+        let rootPath=this.$store.state.project.projectInfo.location
+
+        const _useTestProject=false
+        if(_useTestProject){
+            rootPath="./TestProject"
+        }
+        const classFilePath:string =rootPath+"\\"+"classes.txt"
+        const imgRoot:string =rootPath+"\\"+"images"
+
+        const classes=await ApiManager.readClasses(classFilePath)
         this.$store.commit("project/loadClasses",classes)
 
         ApiManager.maximizeWindow()
 
-        const imgRoot="./TestProject/images" //TODO:プロジェクトの画像フォルダーのパスに変える
         const imageFiles=await ApiManager.readdir(imgRoot)
 
         this.annotationData=new AnnotationData()

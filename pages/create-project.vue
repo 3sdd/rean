@@ -72,6 +72,11 @@ export default Vue.extend({
                 return
             }
             await ApiManager.createProject(projectName,location)
+
+            this.$store.commit("project/new",{
+                projectName:this.projectName,
+                location:this.location
+            })
             
             this.$router.push("/rect-annotator")
         },

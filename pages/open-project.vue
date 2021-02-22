@@ -3,7 +3,7 @@
         プロジェクトを開く
         <div class="ml-2 mb-12">
             <label class="block mb-1">場所</label>
-            <span class="p-2 border border-gray-400">{{location}}</span> 
+            <span class="p-2 border border-gray-400">{{projectRootPath}}</span> 
             <button @click="openDialog()" class="border border-gray-400 p-2">参照</button>
         </div>
 
@@ -22,17 +22,17 @@ import {ApiManager} from "@/utils/apiManager"
 export default Vue.extend({
     data(){
         return {
-            location:"",
+            projectRootPath:"",
         }
     },
     async fetch(){
         const cwd:string=await ApiManager.getCwd()
-        this.location=cwd
+        this.projectRootPath=cwd
     },
     methods:{
         async openDialog(){
             const result=await ApiManager.showOpenDialog({
-                defaultPath:this.location,
+                defaultPath:this.projectRootPath,
                 properties:["openDirectory"]
             })
             console.log(result)
@@ -42,9 +42,13 @@ export default Vue.extend({
             if(result.filePaths.length!==1){
                 throw new Error("エラー:ファイルパスの数が１つではない")
             }
-            this.location=result.filePaths[0]
+            this.projectRootPath=result.filePaths[0]
         },
         openProject(){
+            this.$store.commit("project/new",{
+                projectName:"TODO:プロジェクト名", //TODO:projectRootPathのフォルダー名を入れる
+                location:this.projectRootPath
+            })
 
             this.$router.push("/rect-annotator")
         }

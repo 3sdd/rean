@@ -6,9 +6,9 @@ export const state=()=>({
 })
 
 export const mutations={
-    new(state,projectName,location){
+    new(state,project){
         state.projectInfo=new ProjectInfo(
-            projectName,location
+            project.name,project.location
         )
     },
     loadClasses(state,classes){
