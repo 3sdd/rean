@@ -1,7 +1,5 @@
 <template>
-    <g class="bbox cursor-move"
-
-    >
+    <g class="bbox cursor-move">
         <rect :x="xmin" :y="ymin" :width="width" :height="height" fill="rgba(255,0,0,0.4)" 
             stroke="red" stroke-width="4" stroke-dasharray="0"
             class="bbox-main"
@@ -10,10 +8,7 @@
             @mousemove="drag"
             @mouseleave="endDrag"
             @click="clickBoundingBox"
-
         ></rect>
-        
-
 
         <rect :x="xmin" :y="ymin" fill="red" width="100" height="25"></rect>
         <text :x="xmin" :y="ymin" font-size="15" dominant-baseline="text-before-edge"
@@ -48,17 +43,19 @@
             @mouseup="finishScalingBoundingBox(i)"
         ></circle>
         
-        <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
-            rx="2" ry="2"
-            fill="gray"
-            class="remove-button cursor-pointer"
-            @click="onClickRemoveButton"
-            
-        >
-        </rect>
-        <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" stroke="red" stroke-width="30" 
-            class="pointer-events-none"
-        />
+        <g v-if="isSelected">
+            <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
+                rx="2" ry="2"
+                fill="gray"
+                class="remove-button cursor-pointer"
+                @click="onClickRemoveButton"
+                
+            >
+            </rect>
+            <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" stroke="red" stroke-width="30" 
+                class="pointer-events-none"
+            />
+        </g>
     </g>
 </template>
 
@@ -66,6 +63,11 @@
 import Vue from 'vue'
 export default Vue.extend({
     props:{
+        isSelected:{
+            type:Boolean,
+            required:false,
+            default:false,
+        },
         xmin:{
             type:Number,
             required:true,

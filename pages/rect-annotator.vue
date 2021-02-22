@@ -60,6 +60,7 @@
                         >
                             <SvgBoundingBox
                                 v-for="(bbox,i) in annotationData.boundingBoxes" :key="'bbox_'+i"
+                                :isSelected="i===selectedBoundingBox"
                                 :xmin.sync="bbox.xmin" :ymin.sync="bbox.ymin" 
                                 :xmax.sync="bbox.xmax" :ymax.sync="bbox.ymax"
                                 :label="bbox.label"
@@ -279,7 +280,6 @@ export default Vue.extend({
         removeBoundingBox(index:number){
             this.annotationData?.removeBoundingBox(index)
             if(this.selectedBoundingBox===index){
-                console.log("kessarete")
                 this.selectedBoundingBox=-1
             }
             //TODO:koredeiinoka?
@@ -290,13 +290,10 @@ export default Vue.extend({
             console.log("selected bounding box index:"+this.selectedBoundingBox)
         },
         onClickClass(index:number){
-            console.log("class clicked:"+index)
-            console.log(this.classes[index])
             const bboxIndex=this.selectedBoundingBox
             if(bboxIndex<0){
                 return
             }
-            
             this.annotationData?.setLabel(bboxIndex,this.classes[index])
         },
         getBase64Images(){
