@@ -24,15 +24,6 @@
                     {{selectedBoundingBox}}
                 </div>
                 <div class="bg-green-300 flex justify-center items-center h-full relative">
-                    <!-- <canvas ref="mainCanvas" :width="canvasWidth" :height="canvasHeight"
- 
-                        class="absolute z-20"
-                    ></canvas> -->
-                    <!-- <AuxiliaryLinesCanvas
-                        class="absolute z-20"
-                        :canvasWidth="canvasWidth"
-                        :canvasHeight="canvasHeight"
-                    ></AuxiliaryLinesCanvas> -->
                     <MainImageCanvas 
                         class="absolute z-10 pointer-events-none"
                         :canvasWidth="canvasWidth"
@@ -97,7 +88,6 @@ import {IPoint} from "@/utils/utils"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { IImageData } from '~/utils/imageData'
 import MainImageCanvas from "@/components/MainImageCanvas.vue"
-import AuxiliaryLinesCanvas from "@/components/AuxiliaryLinesCanvas.vue"
 import SvgCrossLine from "@/components/SvgCrossLine.vue"
 
 export default Vue.extend({
@@ -107,7 +97,6 @@ export default Vue.extend({
 
         SvgBoundingBox,
         MainImageCanvas,
-        AuxiliaryLinesCanvas,
         SvgCrossLine
     },
     data(){
@@ -166,15 +155,6 @@ export default Vue.extend({
         selectedImageIndex():number{
             return this.projectInfo.selectedImageIndex
         },
-        
-        // mainCtx(){
-        //     const canvas=<HTMLCanvasElement>this.$refs.mainCanvas
-        //     const ctx=canvas.getContext("2d")
-        //     if(!ctx){
-        //         throw new Error("エラー:getContex('2d')")
-        //     }
-        //     return ctx
-        // },
     },
     methods:{
         //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする
@@ -246,12 +226,10 @@ export default Vue.extend({
             this.mouseY=e.offsetY
         },
         mouseenter(e:MouseEvent){
-            console.log("sho")
             this.showDotLine=true
         },
         mouseleave(e:MouseEvent){
             this.showDotLine=false
-            // clear(this.mainCtx)
         },
         mousedown(e:MouseEvent){
             if(!this.hoverBoundingBox && !this.makingRectangle){
@@ -260,7 +238,6 @@ export default Vue.extend({
                 const y=e.offsetY
                 this.rectangle.point1.x=x
                 this.rectangle.point1.y=y
-
             }
 
         },
