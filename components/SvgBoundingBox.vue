@@ -19,19 +19,19 @@
 
         <line :x1="xmin" :y1="ymin" :x2="xmin" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
             class="cursor-left"
-            @mousedown="startScaling('right-left')"
+            @mousedown="startScaling('left')"
         ></line>
         <line :x1="xmin" :y1="ymin" :x2="xmax" :y2="ymin" stroke="rgba(0,0,255,0.2)" stroke-width="10"
             class="cursor-up"
-            @mousedown="startScaling('up-down')"
+            @mousedown="startScaling('up')"
         ></line>
         <line :x1="xmax" :y1="ymin" :x2="xmax" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
             class="cursor-right"
-            @mousedown="startScaling('right-left')"
+            @mousedown="startScaling('right')"
         ></line>
         <line :x1="xmax" :y1="ymax" :x2="xmin" :y2="ymax" stroke="rgba(0,0,255,0.2)" stroke-width="10"
             class="cursor-down"
-            @mousedown="startScaling('up-down')"
+            @mousedown="startScaling('down')"
         ></line>
 
         <circle 
@@ -39,7 +39,7 @@
             :cx="point.x" :cy="point.y" r="5" fill="red"
             class="bbox-point"
             :class="circleClass(i)"
-            @mousedown="startScaling(getScaleMode('circle',i))"
+            @mousedown="startScaling(getCircleScaleMode(i))"
             @mouseup="finishScalingBoundingBox(i)"
         ></circle>
         
@@ -61,6 +61,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
+
+type ScaleMode="up"| "down" | "right"| "left" |
+                "upper-left" | "upper-right"| "lower-right" | "lower-left"
+
+
 export default Vue.extend({
     props:{
         isSelected:{
@@ -106,6 +111,7 @@ export default Vue.extend({
         height(){
             return <number>this.ymax-<number>this.ymin
         },
+        //TODO:順番変えたい
         fourPoints(){
             return [
                 {x:this.xmin,y:this.ymin},
@@ -167,23 +173,23 @@ export default Vue.extend({
             console.log("SCALE finished")
             this.$emit("finish:scale")
         },
-        startScaling(mode:"up-down"|"right-left"|"upper-right-lower-left"|"upper-left-lower-right"){
+        startScaling(mode:ScaleMode){
             console.log(mode)
             this.$emit("start-scale",mode)
         },
-        getScaleMode(s:"circle",index:number){
-            if(s==="circle"){
-                switch(index){
-                    case 0:
-                    case 2:
-                        return "upper-left-lower-right"
-                    case 1:
-                    case 3:
-                        return "upper-right-lower-left"
-                    default:
-                        throw new Error("not found scale mode")
-                    
-                }
+        getCircleScaleMode(index:number){
+            switch(index){
+                case 0:
+                    return "upper-left"
+                case 1:
+                    return "upper-right"
+                case 2:
+                    return "lower-right"
+                case 3:
+                    return "lower-left"
+                default:
+                    throw new Error("not found scale mode")
+                
             }
         }
     }

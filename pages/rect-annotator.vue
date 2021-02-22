@@ -127,7 +127,13 @@ export default Vue.extend({
             annotationData:null as AnnotationData|null,
             hoverBoundingBox:false,
             selectedBoundingBox:-1,//-1は選択されていない状態。
+
             scaling:false,
+            scale:{
+                isScaling:false,
+                index:-1,
+                mode:""
+            }
         }
     },
     async mounted(){
@@ -234,6 +240,33 @@ export default Vue.extend({
             this.mouseX=e.offsetX
             this.mouseY=e.offsetY
             
+            if(this.scale.isScaling){
+                const bb=this.annotationData?.boundingBoxes[this.scale.index]
+                if(bb){
+                    const mode=this.scale.mode
+                    if(mode==="right"){
+                        bb.xmax=e.offsetX
+                    }else if(mode==="left"){
+                        bb.xmin=e.offsetX
+                    }else if(mode==="up"){
+                        bb.ymin=e.offsetY
+                    }else if(mode==="down"){
+                        bb.ymax=e.offsetY
+                    }else if(mode==="upper-left"){
+                        bb.xmin=e.offsetX
+                        bb.ymin=e.offsetY
+                    }else if(mode==="upper-right"){
+                        bb.xmax=e.offsetX
+                        bb.ymin=e.offsetY
+                    }else if(mode==="lower-right"){
+                        bb.xmax=e.offsetX
+                        bb.ymax=e.offsetY
+                    }else if(mode==="lower-left"){
+                        bb.xmin=e.offsetX
+                        bb.ymax=e.offsetY
+                    }
+                }
+            }
 
         },
         mouseenter(e:MouseEvent){
@@ -269,8 +302,12 @@ export default Vue.extend({
                 if(numBboxes){
                     this.selectedBoundingBox=numBboxes-1 //最後を選択
                 }
-            }else if(this.scaling){
-                this.scaling=false
+            }if(this.scale.isScaling){
+                this.scale={
+                    isScaling:false,
+                    index:-1,
+                    mode:"",
+                }
             }
         },
         addBox(point1:IPoint,point2:IPoint){
@@ -312,9 +349,17 @@ export default Vue.extend({
             this.hoverBoundingBox=true
         },
         startScaling(index:number,e:any){
+            if(this.scaling){
+                return
+            }
             console.log("parent s")
             console.log(index)
             console.log(e)
+            this.scale={
+                isScaling:true,
+                index:index,
+                mode:e
+            }
         },
     }
 })
