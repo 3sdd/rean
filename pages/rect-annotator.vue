@@ -96,6 +96,7 @@ import { IImageData } from '~/utils/imageData'
 import MainImageCanvas from "@/components/MainImageCanvas.vue"
 import SvgCrossLine from "@/components/SvgCrossLine.vue"
 import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
+import {ScaleMode} from "@/utils/scaleMode"
 
 export default Vue.extend({
     components:{
@@ -132,7 +133,7 @@ export default Vue.extend({
             scale:{
                 isScaling:false,
                 index:-1,
-                mode:""
+                mode:"" as ScaleMode|null
             }
         }
     },
@@ -306,7 +307,7 @@ export default Vue.extend({
                 this.scale={
                     isScaling:false,
                     index:-1,
-                    mode:"",
+                    mode:null,
                 }
             }
         },

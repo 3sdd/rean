@@ -61,10 +61,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-
-type ScaleMode="up"| "down" | "right"| "left" |
-                "upper-left" | "upper-right"| "lower-right" | "lower-left"
-
+import {ScaleMode} from "@/utils/scaleMode"
 
 export default Vue.extend({
     props:{
@@ -174,7 +171,6 @@ export default Vue.extend({
             this.$emit("finish:scale")
         },
         startScaling(mode:ScaleMode){
-            console.log(mode)
             this.$emit("start-scale",mode)
         },
         getCircleScaleMode(index:number){
