@@ -47,6 +47,11 @@
                             :width="canvasWidth" :height="canvasHeight"
                             :show="showDotLine"
                         ></SvgCrossLine>
+                        <SvgPreviewBox
+                            :show="makingRectangle"
+                            :x1="rectangle.point1.x" :y1="rectangle.point1.y"
+                            :x2="mouseX" :y2="mouseY"
+                        ></SvgPreviewBox>
                         <g v-if="annotationData!==null" 
                             @mouseenter="mouseenterSvgBoundingBox"
                             @mouseleave="mouseleaveSvgBoundingBox"
@@ -89,6 +94,7 @@ import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { IImageData } from '~/utils/imageData'
 import MainImageCanvas from "@/components/MainImageCanvas.vue"
 import SvgCrossLine from "@/components/SvgCrossLine.vue"
+import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
 
 export default Vue.extend({
     components:{
@@ -97,7 +103,8 @@ export default Vue.extend({
 
         SvgBoundingBox,
         MainImageCanvas,
-        SvgCrossLine
+        SvgCrossLine,
+        SvgPreviewBox
     },
     data(){
         return {
@@ -111,6 +118,7 @@ export default Vue.extend({
             mouseY:0,
 
             makingRectangle:false,
+
             rectangle:{
                 point1:{x:0,y:0},
                 point2:{x:0,y:0}
@@ -224,6 +232,8 @@ export default Vue.extend({
             // }
             this.mouseX=e.offsetX
             this.mouseY=e.offsetY
+            
+
         },
         mouseenter(e:MouseEvent){
             this.showDotLine=true
@@ -238,6 +248,8 @@ export default Vue.extend({
                 const y=e.offsetY
                 this.rectangle.point1.x=x
                 this.rectangle.point1.y=y
+                this.rectangle.point2.x=x
+                this.rectangle.point2.y=y
             }
 
         },
