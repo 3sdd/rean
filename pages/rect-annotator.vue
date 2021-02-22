@@ -4,8 +4,11 @@
         <div class="p-2 bg-blue-200">
             <p>残り枚数 10000枚</p>
         </div>
-        <div class="flex-1 flex flex-row bg-blue-400 ">
-            <div class="w-40 h-ful overflow-y-auto">
+        <div class="flex-1 flex flex-row bg-blue-400 h-full">
+            <div class="w-40 h-ful overflow-y-auto p-1">
+                <div class="mx-auto text-center font-bold text-white mb-5">
+                    
+                </div>
                 <ThumbnailViewer 
                     :base64images="getBase64Images()"
                     :selectedImageIndex="selectedImageIndex"
@@ -23,7 +26,7 @@
                 <div>
                     {{selectedBoundingBox}}
                 </div>
-                <div class="bg-green-300 flex justify-center items-center h-full relative">
+                <div class="bg-green-300 flex justify-center items-center relative">
                     <MainImageCanvas 
                         class="absolute z-10 pointer-events-none"
                         :canvasWidth="canvasWidth"
