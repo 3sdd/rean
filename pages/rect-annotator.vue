@@ -201,6 +201,10 @@ export default Vue.extend({
                 //TODO:アノテーションファイルのパスの取得関数欲しい
                 const filename=this.imageDataList[previousSelectedImageIndex].filename
                 const annotationPath=annotationRootPath+"\\"+`${filename}.json`
+                if(! (await ApiManager.existsPath(annotationRootPath))){
+                    alert("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
+                    return
+                }
                 const annotation=this.annotationData?.toJsonString()
                 console.log(annotation)
                 if(!this.annotationData){
