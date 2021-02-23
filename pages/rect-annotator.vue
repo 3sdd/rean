@@ -5,7 +5,7 @@
             <p>残り枚数 10000枚</p>
         </div>
         <div class="flex-1 flex flex-row bg-blue-400 overflow-y-auto">
-            <div class="w-60 overflow-y-auto p-1">
+            <div class="w-60 overflow-y-auto p-1 flex-shrink-0">
                 <div class="mx-auto text-center font-bold text-white mb-5">
                     
                 </div>
@@ -16,30 +16,39 @@
                 >
                 </ThumbnailViewer>
             </div>
+                <div class="z-80">
+                    canvas size<br>
+                    {{canvasWidth}} |||| {{canvasHeight}},
+                    <br>
+                    annotation size
+                    <br>
+                    {{annotationAreaWidth}}<br>{{annotationAreaHeight}}
+                    <br>
+
+                    {{initialSvgWidth}}<br>{{initialSvgHeight}}
+                    <br>
+                    {{svgScale.width}},{{svgScale.height}}
+                    <br>
+                    {{mouseXSvg}},{{mouseYSvg}}
+                </div>
             <div class="flex-1 bg-purple-300">
-                <div>
-                    {{projectInfo}}
-                </div>
-                <div>
-                    {{hoverBoundingBox}}
-                </div>
-                <div>
-                    {{annotationAreaWidth}},{{annotationAreaHeight}}
-                </div>
-                <div class="bg-green-300 flex justify-center items-center relative"
-                    ref="annotation-working-area"
+                <div class="bg-red-500 flex justify-center items-center relative w-full h-full"
+                    ref="annotationEditor"
                 >
-                    <MainImageCanvas 
-                        class="absolute z-10 pointer-events-none"
-                        :canvasWidth="canvasWidth"
-                        :canvasHeight="canvasHeight"
-                        :base64Image="mainImageBase64"
-                    ></MainImageCanvas>
-                    <svg :width="canvasWidth" :height="canvasHeight"  
-                        :viewBox="`0 0 ${canvasWidth} ${canvasHeight}`" 
+                    <div class="z-10 absolute">
+                        <img :src="mainImageBase64" class="pointer-events-none" 
+                            ref="editorImage"
+                            :width="canvasWidth" :height="canvasHeight"
+                        />
+                    </div>
+                    <div class="z-20 absolute">
+                    <svg :width="initialSvgWidth" :height="initialSvgHeight"
+                        :viewBox="`0 0 ${initialSvgWidth} ${initialSvgHeight}`" 
                         xmlns="http://www.w3.org/2000/svg"
-                        class="z-50"
+                        style="background-color:rgba(255,255,0,0.5);"
+                        :style="{width:canvasWidth,height:canvasHeight}"
                         :key="selectedImageIndex"
+                        ref="editorSvg"
 
                         @mousedown="mousedown"
                         @mouseup="mouseup"
@@ -47,6 +56,7 @@
                         @mouseenter="mouseenter"
                         @mouseleave="mouseleave"
                     >
+                        <circle :cx="mouseXSvg" :cy="mouseYSvg" r="10" fill="black"></circle>
                         <SvgCrossLine class="cursor-event-none"
                             :cx="mouseX" :cy="mouseY"
                             :width="canvasWidth" :height="canvasHeight"
@@ -77,9 +87,10 @@
                             </SvgBoundingBox>
                         </g>
                     </svg>
+                    </div>
                 </div>
             </div>
-            <div class="w-48 bg-purple-600 p-2">
+            <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
                 <ClassList :classes="classes"
                     @class-clicked="onClickClass"
                 ></ClassList>
@@ -143,7 +154,14 @@ export default Vue.extend({
                 isScaling:false,
                 index:-1,
                 mode:"" as ScaleMode|null
-            }
+            },
+
+            annotationAreaWidth:0,
+            annotationAreaHeight:0,
+
+
+            initialSvgWidth:0,
+            initialSvgHeight:0,
         }
     },
     async mounted(){
@@ -164,20 +182,66 @@ export default Vue.extend({
         for(const imgFile of imageFiles){
             const imgPath=imgRoot+"\\"+imgFile
             const imageData=await ApiManager.readImageData(imgPath)
-            console.log(imageData)
 
             this.imageDataList.push(imageData)
         }
         //画像0番目表示
         this.imageSelected(0)
         
+        //リサイズ時の処理
+        window.addEventListener("resize",()=>{
+            console.log("resizeSSSSS")
+            console.log((this.$refs.annotationEditor as Element).getClientRects)
+        })
+        const resizeObserver=new ResizeObserver(entries=>{
+            for(const entry of entries){
+                const rect=entry.contentRect
+                // console.log(rect)
+                // this.annotationAreaWidth=rect.width
+                // this.annotationAreaHeight=rect.height
+
+
+                if(!this.annotationData){
+                    return
+                }
+                console.log(this.annotationData)
+                const imgWidth=this.imageDataList[this.selectedImageIndex].imageWidth ??0
+                const imgHeight=this.imageDataList[this.selectedImageIndex].imageHeight ??0 //TODO:imageWidth, imageHeightの型変更してnullにならないようにする
+                let width=0
+                let height=0
+
+                this.annotationAreaWidth=rect.width
+                this.annotationAreaHeight=rect.height
+                if(imgWidth>imgHeight){
+                    width=rect.width
+                    height=rect.width/imgWidth*imgHeight
+
+                    if(height>rect.height){
+
+                    }
+                    console.log("WIDTH")
+                }else{
+                    height=rect.height
+                    width=rect.height/imgHeight*imgWidth
+
+                    if(width>rect.width){
+
+                    }
+                }
+                this.canvasWidth=width
+                this.canvasHeight=height
+
+
+            }
+        })
+        resizeObserver.observe(this.$refs.annotationEditor)
     },
     computed:{
         projectInfo(){
             return this.$store.state.project.projectInfo as ProjectInfo
         },
         rootPath(){
-            const _useTestProject=false
+            const _useTestProject=true
             if(_useTestProject){
                 return "./TestProject"
             }
@@ -189,24 +253,16 @@ export default Vue.extend({
         selectedImageIndex():number{
             return this.projectInfo.selectedImageIndex
         },
-        annotationAreaWidth(){
-            const a=this.$refs["annotation-working-area"] as HTMLElement
-            console.log(this.$refs)
-            if(!a){
-                console.log("NOT A")
-                return 0
+
+        svgScale:function(){
+
+            const width=this.annotationAreaWidth/this.$data.initialSvgWidth
+            const height=this.annotationAreaHeight/this.$data.initialSvgHeight
+
+            return {
+                width,height
             }
-            console.log(a)
-            return a.offsetWidth
         },
-        annotationAreaHeight(){
-            const a=this.$refs["annotation-working-area"] as HTMLElement
-            if(!a){
-                console.log("NOT A")
-                return 0
-            }
-            return a.offsetHeight
-        }
     },
     methods:{
         //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする
@@ -216,7 +272,7 @@ export default Vue.extend({
             if(previousSelectedImageIndex===index){
                 return
             }
-            const annotationRootPath=this.projectInfo.location+"\\"+"annotations"
+            const annotationRootPath=this.rootPath+"\\"+"annotations"
             
             //アノテーションデータを保存する (前の画像があるとき)
 
@@ -267,6 +323,13 @@ export default Vue.extend({
                 this.annotationData.imageHeight=nextImageData.imageHeight
             }
 
+            const {width:w,height:h}=this.getInitialCanvasSize()
+
+            this.initialSvgWidth=w
+            this.initialSvgHeight=h
+            this.canvasWidth=w
+
+            this.canvasHeight=h
         },
         
         //canvaの画像を選択された画像に変更
@@ -291,8 +354,13 @@ export default Vue.extend({
             //     console.log("P scaling")
             // }
             this.mouseX=e.offsetX
+            // this.mouseX=e.clientX
             this.mouseY=e.offsetY
-            
+
+            this.mouseXSvg=this.getSvgMousePoint(this.mouseX,this.mouseY).x
+            this.mouseYSvg=this.getSvgMousePoint(this.mouseX,this.mouseY).y
+            // this.mouseY=e.clientY
+
             if(this.scale.isScaling){
                 const bb=this.annotationData?.boundingBoxes[this.scale.index]
                 if(bb){
@@ -390,7 +458,6 @@ export default Vue.extend({
             return this.imageDataList.map(x=>x.base64image)
         },
         mouseenterSvgBoundingBox(){
-            console.log("mouseenter")
             this.hoverBoundingBox=true
         },
         mouseleaveSvgBoundingBox(){
@@ -414,6 +481,38 @@ export default Vue.extend({
                 mode:e
             }
         },
+        updateCanvasSize(){
+            const targetElem=this.$refs.annotationEditor as Element
+
+
+        },
+        getInitialCanvasSize(){
+            const targetElem=this.$refs.annotationEditor as Element
+            const width=targetElem.clientWidth
+            const height=targetElem.clientHeight
+
+            return {width,height}
+        },
+        getSvgMousePoint(mouseX:number,mouseY:number){
+            const svg=this.$refs.editorSvg as SVGSVGElement
+            if(!svg){
+                return
+            }
+            const pt=svg.createSVGPoint()
+            if(!pt){
+                return 0
+            }
+            console.log(pt)
+
+            pt.x=mouseX
+            pt.y=mouseY
+            console.log(pt)
+
+            const svgPoint=pt.matrixTransform(svg.getScreenCTM().inverse())
+            console.log(svgPoint)
+
+            return {x:svgPoint.x,y:svgPoint.y}
+        }
     }
 })
 </script>
