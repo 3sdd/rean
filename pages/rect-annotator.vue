@@ -16,19 +16,23 @@
                 >
                 </ThumbnailViewer>
             </div>
-                <div class="z-80">
-                    canvas size<br>
-                    {{canvasWidth}} |||| {{canvasHeight}},
-                    <br>
-                    annotation size
-                    <br>
-                    {{annotationAreaWidth}}<br>{{annotationAreaHeight}}
-                    <br>
-
-                    {{initialSvgWidth}}<br>{{initialSvgHeight}}
-                    <br>
+                <div class="z-80 w-20">
+                    canvas size = ({{canvasWidth}}, {{canvasHeight}} )
+                    <br><br>
+                    annotation size=(
+                    {{annotationAreaWidth}},{{annotationAreaHeight}})
+                    <br><br>
+                    initial svg size=(
+                    {{initialSvgWidth}},{{initialSvgHeight}})
+                    <br><br>
+                    svgScale=
                     {{svgScale.width}},{{svgScale.height}}
-                    <br>
+                    
+                    <br><br>
+                    mouse=
+                    {{mouseX}},{{mouseY}}
+                    <br><br>
+                    mouseXSvg,mouseYSvg=
                     {{mouseXSvg}},{{mouseYSvg}}
                 </div>
             <div class="flex-1 bg-purple-300">
@@ -46,7 +50,7 @@
                         :viewBox="`0 0 ${initialSvgWidth} ${initialSvgHeight}`" 
                         xmlns="http://www.w3.org/2000/svg"
                         style="background-color:rgba(255,255,0,0.5);"
-                        :style="{width:canvasWidth,height:canvasHeight}"
+                        :style="{width:svgStyleWidth,height:svgStyleHeight}"
                         :key="selectedImageIndex"
                         ref="editorSvg"
 
@@ -138,6 +142,9 @@ export default Vue.extend({
             mouseX:0,
             mouseY:0,
 
+            svgStyleWidth:0,
+            svgStyleHeight:0,
+
             makingRectangle:false,
             defaultLabel:"",
 
@@ -162,6 +169,9 @@ export default Vue.extend({
 
             initialSvgWidth:0,
             initialSvgHeight:0,
+
+            mouseXSvg:0,
+            mouseYSvg:0
         }
     },
     async mounted(){
@@ -189,52 +199,59 @@ export default Vue.extend({
         this.imageSelected(0)
         
         //リサイズ時の処理
-        window.addEventListener("resize",()=>{
-            console.log("resizeSSSSS")
-            console.log((this.$refs.annotationEditor as Element).getClientRects)
-        })
+        window.addEventListener("resize",this.onResize)
+        this.onResize()
         const resizeObserver=new ResizeObserver(entries=>{
             for(const entry of entries){
-                const rect=entry.contentRect
-                // console.log(rect)
+                // const rect=entry.contentRect
+                // // console.log(rect)
+                // // this.annotationAreaWidth=rect.width
+                // // this.annotationAreaHeight=rect.height
+
+
+                // if(!this.annotationData){
+                //     return
+                // }
+                // console.log(this.annotationData)
+                // const imgWidth=this.imageDataList[this.selectedImageIndex].imageWidth ??0
+                // const imgHeight=this.imageDataList[this.selectedImageIndex].imageHeight ??0 //TODO:imageWidth, imageHeightの型変更してnullにならないようにする
+                // let width=0
+                // let height=0
+
                 // this.annotationAreaWidth=rect.width
                 // this.annotationAreaHeight=rect.height
+                // if(imgWidth>imgHeight){
+                //     width=rect.width
+                //     height=rect.width/imgWidth*imgHeight
+                //     console.log("WIDTH")
 
+                //     if(height>rect.height){
+                //         console.log(">>>>")
+                //     }
+                // }else{
+                //     height=rect.height
+                //     width=rect.height/imgHeight*imgWidth
+                //     console.log("HEIGHT")
 
-                if(!this.annotationData){
-                    return
-                }
-                console.log(this.annotationData)
-                const imgWidth=this.imageDataList[this.selectedImageIndex].imageWidth ??0
-                const imgHeight=this.imageDataList[this.selectedImageIndex].imageHeight ??0 //TODO:imageWidth, imageHeightの型変更してnullにならないようにする
-                let width=0
-                let height=0
+                //     if(width>rect.width){
+                //         console.log(">>>>")
 
-                this.annotationAreaWidth=rect.width
-                this.annotationAreaHeight=rect.height
-                if(imgWidth>imgHeight){
-                    width=rect.width
-                    height=rect.width/imgWidth*imgHeight
+                //     }
+                // }
+                // console.log("img width,height")
+                // console.log((this.$refs.editorImage as Element).getBoundingClientRect())
+                // console.log((this.$refs.editorImage as Element).clientHeight)
+                // const br=(this.$refs.editorImage as Element).getBoundingClientRect()
+                // this.canvasWidth=width
+                // this.canvasHeight=height
 
-                    if(height>rect.height){
-
-                    }
-                    console.log("WIDTH")
-                }else{
-                    height=rect.height
-                    width=rect.height/imgHeight*imgWidth
-
-                    if(width>rect.width){
-
-                    }
-                }
-                this.canvasWidth=width
-                this.canvasHeight=height
+                // this.svgStyleWidth=br.width
+                // this.svgStyleHeight=br.height
 
 
             }
         })
-        resizeObserver.observe(this.$refs.annotationEditor)
+        // resizeObserver.observe(this.$refs.annotationEditor)
     },
     computed:{
         projectInfo(){
@@ -357,8 +374,10 @@ export default Vue.extend({
             // this.mouseX=e.clientX
             this.mouseY=e.offsetY
 
-            this.mouseXSvg=this.getSvgMousePoint(this.mouseX,this.mouseY).x
-            this.mouseYSvg=this.getSvgMousePoint(this.mouseX,this.mouseY).y
+            this.mouseX=this.getSvgMousePoint(e.clientX,e.clientY).x
+            this.mouseY=this.getSvgMousePoint(e.clientX,e.clientY).y
+            this.mouseXSvg=this.getSvgMousePoint(e.clientX,e.clientY).x
+            this.mouseYSvg=this.getSvgMousePoint(e.clientX,e.clientY).y
             // this.mouseY=e.clientY
 
             if(this.scale.isScaling){
@@ -502,16 +521,69 @@ export default Vue.extend({
             if(!pt){
                 return 0
             }
-            console.log(pt)
 
             pt.x=mouseX
             pt.y=mouseY
-            console.log(pt)
+            // console.log("pt")
+            // console.log(pt)
 
             const svgPoint=pt.matrixTransform(svg.getScreenCTM().inverse())
-            console.log(svgPoint)
+            // console.log("svg point")
+
+            // console.log(svgPoint)
+
 
             return {x:svgPoint.x,y:svgPoint.y}
+        },
+        onResize(){
+            console.log("resizeSSSSS")
+            const targetElem=this.$refs.annotationEditor as Element
+            console.log("target eleme:",targetElem)
+            if(!targetElem){
+                console.log("anno editor undefined")
+                return
+            }
+            //TODO:targetElem.getClientRect()はwidth,heightはエディター全体の大きさなので、画像サイズは、
+            //TODO: その全体のwidth,heightどちらかにぴったりとひっついて収まるような大きさなので、その値を求める
+            console.log((this.$refs.annotationEditor as Element).getClientRects())
+
+            const editorWidth=targetElem.getBoundingClientRect().width
+            const editorHeight=targetElem.getBoundingClientRect().width
+
+            let imgWidth=0
+            let imgHeight=0
+            
+            const actualImgWidth=this.imageDataList[this.selectedImageIndex].imageWidth
+            const actualImgHeight=this.imageDataList[this.selectedImageIndex].imageHeight
+            if(actualImgWidth>actualImgHeight){
+                imgWidth=editorWidth
+
+                const wRatio=editorWidth/actualImgWidth
+                imgHeight=actualImgHeight*wRatio
+                console.log("WIDTH")
+                //TODO:変更後のheight>editorHeightの場合
+                // if(height>rect.height){
+                //     console.log(">>>>")
+                // }
+            }else{
+                imgHeight=editorHeight
+
+                const hRatio=editorHeight/actualImgHeight
+                imgWidth=actualImgHeight*hRatio
+                console.log("HEIGHT")
+                //TODO:変更後のwidth>editorWidthの場合
+
+                // if(width>rect.width){
+                //     console.log(">>>>")
+
+                // }
+            }
+
+            this.canvasWidth=imgWidth
+            this.canvasHeight=imgHeight
+
+            this.svgStyleWidth=imgWidth
+            this.svgStyleHeight=imgHeight
         }
     }
 })
