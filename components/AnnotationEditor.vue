@@ -36,13 +36,6 @@
                 :x1="previewBoxStartPoint.x" :y1="previewBoxStartPoint.y"
                 :x2="svgMouseX" :y2="svgMouseY"
             ></SvgPreviewBox>
-            <g>
-                <circle 
-                    v-for="(bbox,i) in boundingBoxes" :key="'bbox_'+i"
-                    :cx="10" :cy="10+i*20" r="10" fill="blue">
-                </circle>
-                <circle  v-for="(bbox,i) in boundingBoxes" :key="'bbox_'+i" :x="10+100*i" :y="30" r="10" filled="blue"></circle>           
-            </g>
             <g
                 @mouseenter="mouseenterBoundingBox"
                 @mouseleave="mouseleaveBoundingBox"
@@ -50,8 +43,8 @@
                 ref="bboxContainer"
             >
                 <SvgBoundingBox
-                    v-for="(bbox,i) in boundingBoxes" :key="'bbox_'+i"
-                    :isSelected="i===selectedBoundingBox"
+                    v-for="(bbox,i) in svgCoordinateBoundingBoxes" :key="'bbox_'+i"
+                    :isSelected="i===selectedBoundingBoxIndex"
                     :xmin.sync="bbox.xmin" :ymin.sync="bbox.ymin" 
                     :xmax.sync="bbox.xmax" :ymax.sync="bbox.ymax"
                     :label="bbox.label"
@@ -74,6 +67,7 @@ import SvgCrossLine from "@/components/SvgCrossLine.vue"
 import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { BoundingBox } from '~/utils/annotationData'
+import { IPoint } from '~/utils/utils'
 
 export default Vue.extend({
     components:{
@@ -99,11 +93,6 @@ export default Vue.extend({
             type:Array as PropType<BoundingBox[]>,
             required:true
         },
-        selectedBoundingBoxIndex:{
-            type:Number,
-            required:false,
-            default:-1,
-        }
 
     },
     data(){
@@ -121,6 +110,8 @@ export default Vue.extend({
             previewBoxStartPoint:{x:0,y:0},
 
             hoverBoundingBox:false,
+
+            selectedBoundingBoxIndex:-1,
         }
     },
     mounted(){
@@ -134,6 +125,8 @@ export default Vue.extend({
         //TODO:editorの形に収まるようなサイズにする 。現在は画像サイズそのまま
         // @ts-ignore
         console.log(this.calculateImageElementSize())
+        console.log(this.imageElementWidth)
+        console.log(this.imageElementHeight)
 
     },
     computed:{
@@ -157,6 +150,19 @@ export default Vue.extend({
             // @ts-ignore
             const c=this.calculateImageElementSize(this.imageData.imageWidth,this.imageData.imageHeight)
             return c.height
+        },
+        svgCoordinateBoundingBoxes(){
+            const bboxes=[] as BoundingBox[]
+            for(const bbox of this.boundingBoxes){
+                const pmin=this.transformPointSvg(bbox.xmin,bbox.ymin)
+                const pmax=this.transformPointSvg(bbox.xmax,bbox.ymax)
+                const xmin=pmin.x
+                const ymin=pmin.y
+                const xmax=pmax.x
+                const ymax=pmax.y
+                bboxes.push(new BoundingBox(xmin,ymin,xmax,ymax,bbox.label))
+            }
+            return bboxes
         }
     },
 
@@ -185,7 +191,9 @@ export default Vue.extend({
         mouseup(e:MouseEvent){
             if(this.makingBox){
                 this.makingBox=false
-
+                //bounding boxの選択解除
+                const numBboxes=this.boundingBoxes.length
+                this.selectedBoundingBoxIndex=numBboxes-1
 
                 this.$emit("created-box",{
                     startPoint:{x:this.previewBoxStartPoint.x,
@@ -231,7 +239,7 @@ export default Vue.extend({
             this.resizeKey++
             console.log("resize")
         },
-        calculateImageElementSize(imageWidth:number,imageHeight:number):{width:number,height:number}{
+        calculateImageElementSize(imageWidth:number,imageHeight:number){
             console.log("[calculate]")
             if(!this.refAnnotationEditor){
                 return {width:0,height:0}
@@ -290,6 +298,27 @@ export default Vue.extend({
             }
 
             return {width:imgWidth,height:imgHeight}
+        },
+        transformPointSvg(x:number,y:number):IPoint{
+            const svg=this.$refs.editorSvg as SVGSVGElement
+            if(!svg){
+                return {x:0,y:0}
+            }
+            const pt=svg.createSVGPoint()
+            if(!pt){
+                return {x:0,y:0}
+            }
+            pt.x=x
+            pt.y=y
+            // @ts-ignore
+            const svgPoint=pt.matrixTransform(svg.getScreenCTM().inverse())
+
+            return {x:svgPoint.x,y:svgPoint.y}
+        },
+        removeBoundingBox(index:number){
+            //選択解除
+            this.selectedBoundingBoxIndex=-1
+            this.$emit("remove-box",index)
         }
     }
 })

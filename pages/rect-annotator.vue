@@ -42,6 +42,7 @@
                     :selectedImageIndex="selectedImageIndex"
                     :boundingBoxes="bboxes"
                     @created-box="boxCreated"
+                    @remove-box="removeBoundingBox"
                 ></AnnotationEditor>
             </div>
             <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
