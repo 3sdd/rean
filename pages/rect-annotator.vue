@@ -46,11 +46,11 @@
                         />
                     </div>
                     <div class="z-20 absolute">
-                    <svg :width="initialSvgWidth" :height="initialSvgHeight"
+                    <svg :width="svgStyleWidth" :height="svgStyleHeight"
                         :viewBox="`0 0 ${initialSvgWidth} ${initialSvgHeight}`" 
+                        preserveAspectRatio="xMinYMin"
                         xmlns="http://www.w3.org/2000/svg"
                         style="background-color:rgba(255,255,0,0.5);"
-                        :style="{width:svgStyleWidth,height:svgStyleHeight}"
                         :key="selectedImageIndex"
                         ref="editorSvg"
 
@@ -62,14 +62,14 @@
                     >
                         <circle :cx="mouseXSvg" :cy="mouseYSvg" r="10" fill="black"></circle>
                         <SvgCrossLine class="cursor-event-none"
-                            :cx="mouseX" :cy="mouseY"
-                            :width="canvasWidth" :height="canvasHeight"
+                            :cx="mouseXSvg" :cy="mouseYSvg"
+                            :width="widthSvgCoordinate" :height="heightSvgCoordinate"
                             :show="showDotLine"
                         ></SvgCrossLine>
                         <SvgPreviewBox
                             :show="makingRectangle"
                             :x1="rectangle.point1.x" :y1="rectangle.point1.y"
-                            :x2="mouseX" :y2="mouseY"
+                            :x2="mouseXSvg" :y2="mouseYSvg"
                         ></SvgPreviewBox>
                         <g v-if="annotationData!==null" 
                             @mouseenter="mouseenterSvgBoundingBox"
@@ -145,6 +145,8 @@ export default Vue.extend({
             svgStyleWidth:0,
             svgStyleHeight:0,
 
+            imgRef:null as Element|null,
+
             makingRectangle:false,
             defaultLabel:"",
 
@@ -201,57 +203,8 @@ export default Vue.extend({
         //リサイズ時の処理
         window.addEventListener("resize",this.onResize)
         this.onResize()
-        const resizeObserver=new ResizeObserver(entries=>{
-            for(const entry of entries){
-                // const rect=entry.contentRect
-                // // console.log(rect)
-                // // this.annotationAreaWidth=rect.width
-                // // this.annotationAreaHeight=rect.height
 
-
-                // if(!this.annotationData){
-                //     return
-                // }
-                // console.log(this.annotationData)
-                // const imgWidth=this.imageDataList[this.selectedImageIndex].imageWidth ??0
-                // const imgHeight=this.imageDataList[this.selectedImageIndex].imageHeight ??0 //TODO:imageWidth, imageHeightの型変更してnullにならないようにする
-                // let width=0
-                // let height=0
-
-                // this.annotationAreaWidth=rect.width
-                // this.annotationAreaHeight=rect.height
-                // if(imgWidth>imgHeight){
-                //     width=rect.width
-                //     height=rect.width/imgWidth*imgHeight
-                //     console.log("WIDTH")
-
-                //     if(height>rect.height){
-                //         console.log(">>>>")
-                //     }
-                // }else{
-                //     height=rect.height
-                //     width=rect.height/imgHeight*imgWidth
-                //     console.log("HEIGHT")
-
-                //     if(width>rect.width){
-                //         console.log(">>>>")
-
-                //     }
-                // }
-                // console.log("img width,height")
-                // console.log((this.$refs.editorImage as Element).getBoundingClientRect())
-                // console.log((this.$refs.editorImage as Element).clientHeight)
-                // const br=(this.$refs.editorImage as Element).getBoundingClientRect()
-                // this.canvasWidth=width
-                // this.canvasHeight=height
-
-                // this.svgStyleWidth=br.width
-                // this.svgStyleHeight=br.height
-
-
-            }
-        })
-        // resizeObserver.observe(this.$refs.annotationEditor)
+        this.imgRef=this.$refs.editorImage as Element
     },
     computed:{
         projectInfo(){
@@ -280,6 +233,40 @@ export default Vue.extend({
                 width,height
             }
         },
+
+        widthSvgCoordinate(){
+            console.log("SVG COORDI")
+            const imgRef=this.imgRef
+            if(!imgRef){
+                return
+            }
+            const refEditor=this.$refs.annotationEditor as Element
+            const rect=refEditor.getBoundingClientRect()
+            console.log("WIDTH SVG COORDINATE")
+            console.log(this.canvasWidth)
+            const top=rect.top
+            const left=rect.left
+            const bottom=rect.bottom
+            const right=rect.right
+            console.log("left:",left)
+            const topLeftSvg=this.transformPointSvg(left,top)
+            const topRightSvg=this.transformPointSvg(right,top)
+            console.log("top left ",topLeftSvg)
+            console.log("top right ",topRightSvg)
+            console.log("top right +offsexx ",topRightSvg+rect.left)
+            const svgWidth=topRightSvg.x-topLeftSvg.x
+            const out2=this.transformPointSvg(top,right)
+            console.log("width svg",svgWidth)
+            console.log("width + left",right)
+            // console.log("svg width:",out1.y)
+            // console.log("out2:",out2)
+            return this.transformPointSvg(right,top).x
+            // return topRightSvg.x
+        },
+        heightSvgCoordinate(){
+            const out=this.transformPointSvg(this.canvasWidth,this.canvasHeight) 
+            return out.y
+        }
     },
     methods:{
         //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする
@@ -370,14 +357,12 @@ export default Vue.extend({
             // }else if(this.scaling){
             //     console.log("P scaling")
             // }
-            this.mouseX=e.offsetX
+            this.mouseX=e.clientX
             // this.mouseX=e.clientX
-            this.mouseY=e.offsetY
+            this.mouseY=e.clientY
 
-            this.mouseX=this.getSvgMousePoint(e.clientX,e.clientY).x
-            this.mouseY=this.getSvgMousePoint(e.clientX,e.clientY).y
-            this.mouseXSvg=this.getSvgMousePoint(e.clientX,e.clientY).x
-            this.mouseYSvg=this.getSvgMousePoint(e.clientX,e.clientY).y
+            this.mouseXSvg=this.transformPointSvg(e.clientX,e.clientY).x
+            this.mouseYSvg=this.transformPointSvg(e.clientX,e.clientY).y
             // this.mouseY=e.clientY
 
             if(this.scale.isScaling){
@@ -512,26 +497,19 @@ export default Vue.extend({
 
             return {width,height}
         },
-        getSvgMousePoint(mouseX:number,mouseY:number){
+        transformPointSvg(x:number,y:number):IPoint{
             const svg=this.$refs.editorSvg as SVGSVGElement
             if(!svg){
-                return
+                return {x:0,y:0}
             }
             const pt=svg.createSVGPoint()
             if(!pt){
-                return 0
+                return {x:0,y:0}
             }
-
-            pt.x=mouseX
-            pt.y=mouseY
-            // console.log("pt")
-            // console.log(pt)
+            pt.x=x
+            pt.y=y
 
             const svgPoint=pt.matrixTransform(svg.getScreenCTM().inverse())
-            // console.log("svg point")
-
-            // console.log(svgPoint)
-
 
             return {x:svgPoint.x,y:svgPoint.y}
         },
@@ -548,7 +526,7 @@ export default Vue.extend({
             console.log((this.$refs.annotationEditor as Element).getClientRects())
 
             const editorWidth=targetElem.getBoundingClientRect().width
-            const editorHeight=targetElem.getBoundingClientRect().width
+            const editorHeight=targetElem.getBoundingClientRect().height
 
             let imgWidth=0
             let imgHeight=0
@@ -561,6 +539,11 @@ export default Vue.extend({
                 const wRatio=editorWidth/actualImgWidth
                 imgHeight=actualImgHeight*wRatio
                 console.log("WIDTH")
+                console.log("actuial img width height",actualImgWidth+","+actualImgHeight)
+                console.log("editor width height",editorWidth+","+editorHeight)
+                console.log("wratio:",wRatio)
+                console.log("img width,img height:",imgWidth+","+imgHeight)
+
                 //TODO:変更後のheight>editorHeightの場合
                 // if(height>rect.height){
                 //     console.log(">>>>")
