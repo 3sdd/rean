@@ -31,9 +31,6 @@
                     <br><br>
                     mouse=
                     {{mouseX}},{{mouseY}}
-                    <br><br>
-                    mouseXSvg,mouseYSvg=
-                    {{mouseXSvg}},{{mouseYSvg}}
                 </div>
             <div class="flex-1 bg-purple-300">
                 <AnnotationEditor
@@ -87,38 +84,19 @@ export default Vue.extend({
             mouseX:0,
             mouseY:0,
 
-            svgStyleWidth:0,
-            svgStyleHeight:0,
 
             imgRef:null as Element|null,
 
-            makingRectangle:false,
             defaultLabel:"",
 
-            rectangle:{
-                point1:{x:0,y:0},
-                point2:{x:0,y:0}
-            },
             annotationData:null as AnnotationData|null,
-            hoverBoundingBox:false,
             selectedBoundingBox:-1,//-1は選択されていない状態。
-
-            scaling:false,
-            scale:{
-                isScaling:false,
-                index:-1,
-                mode:"" as ScaleMode|null
-            },
 
             annotationAreaWidth:0,
             annotationAreaHeight:0,
 
-
             initialSvgWidth:0,
             initialSvgHeight:0,
-
-            mouseXSvg:0,
-            mouseYSvg:0
         }
     },
     async mounted(){
@@ -297,95 +275,6 @@ export default Vue.extend({
         changeImage(index:number){
             this.mainImageBase64=this.imageDataList[index].base64image
         },
-        mousemove(e:MouseEvent){
-            // const ctx=this.mainCtx
-            // clear(ctx)
-            // const x=e.offsetX
-            // const y=e.offsetY
-            // if(!this.hoverBoundingBox && this.showDotLine){
-            //     ctx.strokeStyle="gray"
-            //     drawCrossLine(ctx,x,y)
-            // }
-
-            // if(this.makingRectangle){
-            //     ctx.setLineDash([])
-            //     ctx.strokeStyle="black"
-            //     drawBox(ctx,this.rectangle.point1,{x,y})
-            // }else if(this.scaling){
-            //     console.log("P scaling")
-            // }
-            this.mouseX=e.clientX
-            // this.mouseX=e.clientX
-            this.mouseY=e.clientY
-
-            this.mouseXSvg=this.transformPointSvg(e.clientX,e.clientY).x
-            this.mouseYSvg=this.transformPointSvg(e.clientX,e.clientY).y
-            // this.mouseY=e.clientY
-
-            if(this.scale.isScaling){
-                const bb=this.annotationData?.boundingBoxes[this.scale.index]
-                if(bb){
-                    const mode=this.scale.mode
-                    if(mode==="right"){
-                        bb.xmax=e.offsetX
-                    }else if(mode==="left"){
-                        bb.xmin=e.offsetX
-                    }else if(mode==="up"){
-                        bb.ymin=e.offsetY
-                    }else if(mode==="down"){
-                        bb.ymax=e.offsetY
-                    }else if(mode==="upper-left"){
-                        bb.xmin=e.offsetX
-                        bb.ymin=e.offsetY
-                    }else if(mode==="upper-right"){
-                        bb.xmax=e.offsetX
-                        bb.ymin=e.offsetY
-                    }else if(mode==="lower-right"){
-                        bb.xmax=e.offsetX
-                        bb.ymax=e.offsetY
-                    }else if(mode==="lower-left"){
-                        bb.xmin=e.offsetX
-                        bb.ymax=e.offsetY
-                    }
-                }
-            }
-
-        },
-        mousedown(e:MouseEvent){
-            if(!this.hoverBoundingBox && !this.makingRectangle){
-                this.makingRectangle=true
-                const x=e.offsetX
-                const y=e.offsetY
-                this.rectangle.point1.x=x
-                this.rectangle.point1.y=y
-                this.rectangle.point2.x=x
-                this.rectangle.point2.y=y
-            }
-
-        },
-        mouseup(e:MouseEvent){
-            console.log("mouseup")
-            if(this.makingRectangle){
-                this.makingRectangle=false
-                const x=e.offsetX
-                const y=e.offsetY
-
-                this.rectangle.point2.x=x
-                this.rectangle.point2.y=y
-
-                this.addBox(this.rectangle.point1,this.rectangle.point2)
-                const numBboxes=this.annotationData?.boundingBoxes?.length
-                if(numBboxes){
-                    this.selectedBoundingBox=numBboxes-1 //最後を選択
-                }
-            }if(this.scale.isScaling){
-                this.scale={
-                    isScaling:false,
-                    index:-1,
-                    mode:null,
-                }
-            }
-        },
         addBox(point1:IPoint,point2:IPoint){
             const boundingBox=BoundingBox.fromTwoPoints(point1,point2,this.defaultLabel)
             this.annotationData?.addBoundingBox(boundingBox)
@@ -395,8 +284,6 @@ export default Vue.extend({
             if(this.selectedBoundingBox===index){
                 this.selectedBoundingBox=-1
             }
-            //TODO:koredeiinoka?
-            this.hoverBoundingBox=false
         },
         clickBoundingBox(index:number){
             this.selectedBoundingBox=index
@@ -411,17 +298,6 @@ export default Vue.extend({
         },
         getBase64Images(){
             return this.imageDataList.map(x=>x.base64image)
-        },
-
-        startScaling(index:number,e:any){
-            if(this.scaling){
-                return
-            }
-            this.scale={
-                isScaling:true,
-                index:index,
-                mode:e
-            }
         },
         getInitialCanvasSize(){
             const targetElem=this.$refs.annotationEditor as Element
