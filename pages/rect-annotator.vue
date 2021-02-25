@@ -62,8 +62,7 @@ import {IPoint} from "@/utils/utils"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { IImageData } from '~/utils/imageData'
 import MainImageCanvas from "@/components/MainImageCanvas.vue"
-import SvgCrossLine from "@/components/SvgCrossLine.vue"
-import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
+
 import {ScaleMode} from "@/utils/scaleMode"
 import AnnotationEditor from "@/components/AnnotationEditor.vue"
 
@@ -72,10 +71,8 @@ export default Vue.extend({
         ClassList,
         ThumbnailViewer,
 
-        SvgBoundingBox,
         MainImageCanvas,
-        SvgCrossLine,
-        SvgPreviewBox,
+
         AnnotationEditor
     },
     data(){

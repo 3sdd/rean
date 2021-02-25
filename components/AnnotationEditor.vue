@@ -31,11 +31,11 @@
                 :width="imageElementWidth" :height="imageElementHeight"
                 :show="showDotLine"
             ></SvgCrossLine>
-            <!-- <SvgPreviewBox
-                :show="makingRectangle"
-                :x1="rectangle.point1.x" :y1="rectangle.point1.y"
-                :x2="mouseXSvg" :y2="mouseYSvg"
-            ></SvgPreviewBox> -->
+            <SvgPreviewBox
+                :show="makingBox"
+                :x1="previewBoxStartPoint.x" :y1="previewBoxStartPoint.y"
+                :x2="svgMouseX" :y2="svgMouseY"
+            ></SvgPreviewBox>
             <!-- <g v-if="annotationData!==null" 
                 @mouseenter="mouseenterSvgBoundingBox"
                 @mouseleave="mouseleaveSvgBoundingBox"
@@ -64,9 +64,14 @@
 import Vue, {PropType} from 'vue'
 import { IImageData } from '~/utils/imageData'
 import SvgCrossLine from "@/components/SvgCrossLine.vue"
+import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
+import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
+
 export default Vue.extend({
     components:{
-        SvgCrossLine
+        SvgCrossLine,
+        SvgPreviewBox,
+        SvgBoundingBox,
     },
     props:{
         mainImageBase64:{
@@ -93,7 +98,12 @@ export default Vue.extend({
             resizeKey:0,//リサイズするたぶにcomputedのimageElementWidth,heightを更新したので、更新用のキー
             
             svgMouseX:0,//サポート線の表示に使う マウス位置 x
-            svgMouseY:0 //サポート線の表示に使う マウス位置　y
+            svgMouseY:0, //サポート線の表示に使う マウス位置　y
+
+            makingBox:false,
+            previewBoxStartPoint:{x:0,y:0},
+
+
         }
     },
     mounted(){
@@ -146,6 +156,14 @@ export default Vue.extend({
             this.svgMouseY=e.offsetY
         },
         mousedown(e:MouseEvent){
+            if(!this.makingBox){
+                this.makingBox=true
+                this.previewBoxStartPoint={
+                    x:e.offsetX,y:e.offsetY
+                }
+                console.log("start creating box")
+                console.log(this.previewBoxStartPoint)
+            }
             // if(!this.hoverBoundingBox && !this.makingRectangle){
             //     this.makingRectangle=true
             //     const x=e.offsetX
@@ -158,6 +176,15 @@ export default Vue.extend({
 
         },
         mouseup(e:MouseEvent){
+            if(this.makingBox){
+                this.makingBox=false
+
+
+                // this.$emit("created-box",{
+                //     startPoint:this.previewBoxStartPoint,
+                //     endPoint:{x:e.offsetX,y:e.offsetY}
+                // })
+            }
             // console.log("mouseup")
             // if(this.makingRectangle){
             //     this.makingRectangle=false
