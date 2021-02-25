@@ -16,11 +16,6 @@
                 >
                 </ThumbnailViewer>
             </div>
-                <div class="z-80 w-20">
-                    initial svg size=(
-                    {{initialSvgWidth}},{{initialSvgHeight}})
-                    <br><br>
-                </div>
             <div class="flex-1 bg-purple-300">
                 <AnnotationEditor
                     :mainImageBase64="mainImageBase64"
@@ -52,17 +47,13 @@ import { ProjectInfo } from '~/utils/projectInfo'
 import {IPoint} from "@/utils/utils"
 import { IImageData } from '~/utils/imageData'
 import MainImageCanvas from "@/components/MainImageCanvas.vue"
-
-import {ScaleMode} from "@/utils/scaleMode"
 import AnnotationEditor from "@/components/AnnotationEditor.vue"
 
 export default Vue.extend({
     components:{
         ClassList,
         ThumbnailViewer,
-
         MainImageCanvas,
-
         AnnotationEditor
     },
     data(){
@@ -74,9 +65,7 @@ export default Vue.extend({
 
             annotationData:new AnnotationData(),
             selectedBoundingBoxIndex:-1,//-1は選択されていない状態。
-
-            initialSvgWidth:0,
-            initialSvgHeight:0,            
+            
         }
     },
     async mounted(){
@@ -102,9 +91,6 @@ export default Vue.extend({
         //画像0番目表示
         this.imageSelected(0)
         
-        //リサイズ時の処理
-
-
     },
     computed:{
         projectInfo(){
@@ -131,10 +117,6 @@ export default Vue.extend({
             const d=this.imageDataList[this.selectedImageIndex]
             return d
         },
-        bboxes():BoundingBox[]{
-            // @ts-ignore
-            return this.annotationData?.boundingBoxes ?? []  as Boundingbox[]
-        }
     },
     methods:{
         //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする
@@ -157,7 +139,7 @@ export default Vue.extend({
                     alert("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
                     return
                 }
-                const annotation=this.annotationData?.toJsonString()
+                const annotation=this.annotationData.toJsonString()
                 console.log(annotation)
                 if(this.annotationData===null){
                     console.error("no annotation data")
@@ -194,13 +176,6 @@ export default Vue.extend({
                 this.annotationData.imageWidth=nextImageData.imageWidth
                 this.annotationData.imageHeight=nextImageData.imageHeight
             }
-
-            // const {width:w,height:h}=this.getInitialCanvasSize()
-            const w=0,h=0
-
-            this.initialSvgWidth=w
-            this.initialSvgHeight=h
-
         },
         
         //canvaの画像を選択された画像に変更
@@ -209,10 +184,10 @@ export default Vue.extend({
         },
         addBox(point1:IPoint,point2:IPoint){
             const boundingBox=BoundingBox.fromTwoPoints(point1,point2,this.defaultLabel)
-            this.annotationData?.addBoundingBox(boundingBox)
+            this.annotationData.addBoundingBox(boundingBox)
         },
         removeBoundingBox(index:number){
-            this.annotationData?.removeBoundingBox(index)
+            this.annotationData.removeBoundingBox(index)
             // this.selectedBoundingBoxIndex=-1
         },
         onClickClass(index:number){
@@ -227,13 +202,6 @@ export default Vue.extend({
         },
         getBase64Images(){
             return this.imageDataList.map(x=>x.base64image)
-        },
-        getInitialCanvasSize(){
-            const targetElem=this.$refs.annotationEditor as Element
-            const width=targetElem.clientWidth
-            const height=targetElem.clientHeight
-
-            return {width,height}
         },
         boxCreated(args:{startPoint:IPoint,endPoint:IPoint}){
             const {startPoint,endPoint}=args
@@ -251,7 +219,6 @@ export default Vue.extend({
             bbox.ymin=boundingBox.ymin
             bbox.xmax=boundingBox.xmax
             bbox.ymax=boundingBox.ymax
-
         }
     }
 })
