@@ -40,6 +40,8 @@
                     :mainImageBase64="mainImageBase64"
                     :imageData="selectedImageData"
                     :selectedImageIndex="selectedImageIndex"
+                    :boundingBoxes="bboxes"
+                    @created-box="boxCreated"
                 ></AnnotationEditor>
             </div>
             <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
@@ -59,7 +61,6 @@ import {AnnotationData, BoundingBox} from "@/utils/annotationData"
 import {drawBox,clear,drawCrossLine, drawBoundingBoxes,drawBoundingBox} from "@/utils/drawing"
 import { ProjectInfo } from '~/utils/projectInfo'
 import {IPoint} from "@/utils/utils"
-import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { IImageData } from '~/utils/imageData'
 import MainImageCanvas from "@/components/MainImageCanvas.vue"
 
@@ -217,6 +218,13 @@ export default Vue.extend({
             }
             const d=this.imageDataList[this.selectedImageIndex]
             return d
+        },
+        bboxes():BoundingBox[]{
+            // @ts-ignore
+            const t=this.annotationData?.boundingBoxes ?? []  as Boundingbox[]
+            console.log("bbox")
+            console.log(t)
+            return t
         }
     },
     methods:{
@@ -447,7 +455,17 @@ export default Vue.extend({
             const svgPoint=pt.matrixTransform(svg.getScreenCTM().inverse())
 
             return {x:svgPoint.x,y:svgPoint.y}
-        }
+        },
+        boxCreated(args:{startPoint:IPoint,endPoint:IPoint}){
+            const {startPoint,endPoint}=args
+            console.log("box added")
+            console.log(startPoint)
+            console.log(endPoint)
+
+            this.addBox(startPoint,endPoint)
+
+            console.log(this.annotationData?.boundingBoxes)
+        },
     }
 })
 </script>

@@ -36,25 +36,32 @@
                 :x1="previewBoxStartPoint.x" :y1="previewBoxStartPoint.y"
                 :x2="svgMouseX" :y2="svgMouseY"
             ></SvgPreviewBox>
-            <!-- <g v-if="annotationData!==null" 
-                @mouseenter="mouseenterSvgBoundingBox"
-                @mouseleave="mouseleaveSvgBoundingBox"
-                @mouseover="mouseoverSvgBoundingBox"
+            <g>
+                <circle 
+                    v-for="(bbox,i) in boundingBoxes" :key="'bbox_'+i"
+                    :cx="10" :cy="10+i*20" r="10" fill="blue">
+                </circle>
+                <circle  v-for="(bbox,i) in boundingBoxes" :key="'bbox_'+i" :x="10+100*i" :y="30" r="10" filled="blue"></circle>           
+            </g>
+            <g
+                @mouseenter="mouseenterBoundingBox"
+                @mouseleave="mouseleaveBoundingBox"
+                @mouseover="mouseoverBoundingBox"
                 ref="bboxContainer"
             >
                 <SvgBoundingBox
-                    v-for="(bbox,i) in annotationData.boundingBoxes" :key="'bbox_'+i"
+                    v-for="(bbox,i) in boundingBoxes" :key="'bbox_'+i"
                     :isSelected="i===selectedBoundingBox"
                     :xmin.sync="bbox.xmin" :ymin.sync="bbox.ymin" 
                     :xmax.sync="bbox.xmax" :ymax.sync="bbox.ymax"
                     :label="bbox.label"
                     :showRemoveButton="true"
-                    @click-bounding-box="clickBoundingBox(i)"
+                    @click-bounding-box="selectedBoundingBoxIndex=i"
                     @remove="removeBoundingBox(i)"
                     @start-scale="startScaling(i,$event)"
                 >
                 </SvgBoundingBox>
-            </g> -->
+            </g>
         </svg>
         </div>
     </div>
@@ -66,6 +73,7 @@ import { IImageData } from '~/utils/imageData'
 import SvgCrossLine from "@/components/SvgCrossLine.vue"
 import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
+import { BoundingBox } from '~/utils/annotationData'
 
 export default Vue.extend({
     components:{
@@ -86,6 +94,15 @@ export default Vue.extend({
         selectedImageIndex:{//TODO:keyとして使ってるだけ？いらない？
             type:Number,
             required:true,
+        },
+        boundingBoxes:{
+            type:Array as PropType<BoundingBox[]>,
+            required:true
+        },
+        selectedBoundingBoxIndex:{
+            type:Number,
+            required:false,
+            default:-1,
         }
 
     },
@@ -103,7 +120,7 @@ export default Vue.extend({
             makingBox:false,
             previewBoxStartPoint:{x:0,y:0},
 
-
+            hoverBoundingBox:false,
         }
     },
     mounted(){
@@ -156,7 +173,7 @@ export default Vue.extend({
             this.svgMouseY=e.offsetY
         },
         mousedown(e:MouseEvent){
-            if(!this.makingBox){
+            if(!this.hoverBoundingBox && !this.makingBox){
                 this.makingBox=true
                 this.previewBoxStartPoint={
                     x:e.offsetX,y:e.offsetY
@@ -164,26 +181,17 @@ export default Vue.extend({
                 console.log("start creating box")
                 console.log(this.previewBoxStartPoint)
             }
-            // if(!this.hoverBoundingBox && !this.makingRectangle){
-            //     this.makingRectangle=true
-            //     const x=e.offsetX
-            //     const y=e.offsetY
-            //     this.rectangle.point1.x=x
-            //     this.rectangle.point1.y=y
-            //     this.rectangle.point2.x=x
-            //     this.rectangle.point2.y=y
-            // }
-
         },
         mouseup(e:MouseEvent){
             if(this.makingBox){
                 this.makingBox=false
 
 
-                // this.$emit("created-box",{
-                //     startPoint:this.previewBoxStartPoint,
-                //     endPoint:{x:e.offsetX,y:e.offsetY}
-                // })
+                this.$emit("created-box",{
+                    startPoint:{x:this.previewBoxStartPoint.x,
+                                y:this.previewBoxStartPoint.y},
+                    endPoint:{x:e.offsetX, y:e.offsetY}
+                })
             }
             // console.log("mouseup")
             // if(this.makingRectangle){
@@ -206,6 +214,16 @@ export default Vue.extend({
             //         mode:null,
             //     }
             // }
+        },
+
+        mouseenterBoundingBox(){
+            this.hoverBoundingBox=true
+        },
+        mouseleaveBoundingBox(){
+            this.hoverBoundingBox=false
+        },
+        mouseoverBoundingBox(){
+            this.hoverBoundingBox=true
         },
 
 
