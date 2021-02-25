@@ -38,6 +38,7 @@
                     :imageData="selectedImageData"
                     :selectedImageIndex="selectedImageIndex"
                     :boundingBoxes="bboxes"
+                    :selectedBoundingBoxIndex.sync="selectedBoundingBoxIndex"
                     @created-box="boxCreated"
                     @remove-box="removeBoundingBox"
                 ></AnnotationEditor>
@@ -90,17 +91,17 @@ export default Vue.extend({
             defaultLabel:"",
 
             annotationData:null as AnnotationData|null,
-            selectedBoundingBox:-1,//-1は選択されていない状態。
+            selectedBoundingBoxIndex:-1,//-1は選択されていない状態。
 
             annotationAreaWidth:0,
             annotationAreaHeight:0,
 
             initialSvgWidth:0,
             initialSvgHeight:0,
+            
         }
     },
     async mounted(){
-
 
         const classFilePath:string =this.rootPath+"\\"+"classes.txt"
         const imgRoot:string =this.rootPath+"\\"+"images"
@@ -281,16 +282,10 @@ export default Vue.extend({
         },
         removeBoundingBox(index:number){
             this.annotationData?.removeBoundingBox(index)
-            if(this.selectedBoundingBox===index){
-                this.selectedBoundingBox=-1
-            }
-        },
-        clickBoundingBox(index:number){
-            this.selectedBoundingBox=index
-            console.log("selected bounding box index:"+this.selectedBoundingBox)
+            // this.selectedBoundingBoxIndex=-1
         },
         onClickClass(index:number){
-            const bboxIndex=this.selectedBoundingBox
+            const bboxIndex=this.selectedBoundingBoxIndex
             if(bboxIndex<0){
                 return
             }

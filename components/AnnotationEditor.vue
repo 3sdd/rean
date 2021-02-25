@@ -35,9 +35,10 @@
                 :show="makingBox"
                 :x1="previewBoxStartPoint.x" :y1="previewBoxStartPoint.y"
                 :x2="svgMouseX" :y2="svgMouseY"
+                class="cursor-event-none"
             ></SvgPreviewBox>
             <text :x="10" :y="20">{{svgMouseX}},{{svgMouseY}}</text>
-            <text :x="10" :y="70">{{makingBox}},{{hoverBoundingBox}}</text>
+            <text :x="10" :y="70">{{selectedBoundingBoxIndex}}</text>
             <g
                 @mouseenter="mouseenterBoundingBox"
                 @mouseleave="mouseleaveBoundingBox"
@@ -51,7 +52,7 @@
                     :xmax.sync="bbox.xmax" :ymax.sync="bbox.ymax"
                     :label="bbox.label"
                     :showRemoveButton="true"
-                    @click-bounding-box="selectedBoundingBoxIndex=i"
+                    @click-bounding-box="clickBoundingBox(i)"
                     @remove="removeBoundingBox(i)"
                     @start-scale="startScaling(i,$event)"
                 >
@@ -96,6 +97,10 @@ export default Vue.extend({
             type:Array as PropType<BoundingBox[]>,
             required:true
         },
+        selectedBoundingBoxIndex:{
+            type:Number,
+            required:true,
+        }
 
 
     },
@@ -115,7 +120,7 @@ export default Vue.extend({
 
             hoverBoundingBox:false,
 
-            selectedBoundingBoxIndex:-1,
+            // selectedBoundingBoxIndex:-1,
 
             initialWidth:0,
             initialHeight:0,
@@ -182,13 +187,13 @@ export default Vue.extend({
             for(const bbox of this.boundingBoxes){
                 const pmin={x:bbox.xmin,y:bbox.ymin}
                 const pmax={x:bbox.xmax,y:bbox.ymax}
-                console.log(pmin.x,pmin.y,pmax.x,pmax.y)
-                console.log([xratio,yratio])
+                // console.log(pmin.x,pmin.y,pmax.x,pmax.y)
+                // console.log([xratio,yratio])
                 const xmin=pmin.x*xratio
                 const ymin=pmin.y*yratio
                 const xmax=pmax.x*xratio
                 const ymax=pmax.y*yratio
-                console.log([xmin,ymin,xmax,ymax])
+                // console.log([xmin,ymin,xmax,ymax])
                 bboxes.push(new BoundingBox(xmin,ymin,xmax,ymax,bbox.label))
             }
             return bboxes
@@ -254,7 +259,10 @@ export default Vue.extend({
         mouseoverBoundingBox(){
             this.hoverBoundingBox=true
         },
-
+        clickBoundingBox(index:number){
+            //index:クリックされたbounding boxのindex
+            this.$emit("update:selectedBoundingBoxIndex",index)
+        },
 
         onResize(){
             this.resizeKey++
@@ -338,7 +346,8 @@ export default Vue.extend({
         },
         removeBoundingBox(index:number){
             //選択解除
-            this.selectedBoundingBoxIndex=-1
+            this.$emit("update:selectedBoundingBoxIndex",-1)
+
             this.hoverBoundingBox=false
 
             this.$emit("remove-box",index)
