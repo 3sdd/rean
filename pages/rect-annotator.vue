@@ -17,20 +17,9 @@
                 </ThumbnailViewer>
             </div>
                 <div class="z-80 w-20">
-                    canvas size = ({{canvasWidth}}, {{canvasHeight}} )
-                    <br><br>
-                    annotation size=(
-                    {{annotationAreaWidth}},{{annotationAreaHeight}})
-                    <br><br>
                     initial svg size=(
                     {{initialSvgWidth}},{{initialSvgHeight}})
                     <br><br>
-                    svgScale=
-                    {{svgScale.width}},{{svgScale.height}}
-                    
-                    <br><br>
-                    mouse=
-                    {{mouseX}},{{mouseY}}
                 </div>
             <div class="flex-1 bg-purple-300">
                 <AnnotationEditor
@@ -79,27 +68,15 @@ export default Vue.extend({
     data(){
         return {
             imageDataList:[] as Array<IImageData>,
-            canvasWidth:700,
-            canvasHeight:700,
             mainImageBase64:"",
-
-            mouseX:0,
-            mouseY:0,
-
-
-            imgRef:null as Element|null,
 
             defaultLabel:"",
 
             annotationData:new AnnotationData(),
             selectedBoundingBoxIndex:-1,//-1は選択されていない状態。
 
-            annotationAreaWidth:0,
-            annotationAreaHeight:0,
-
             initialSvgWidth:0,
-            initialSvgHeight:0,
-            
+            initialSvgHeight:0,            
         }
     },
     async mounted(){
@@ -128,7 +105,6 @@ export default Vue.extend({
         //リサイズ時の処理
 
 
-        this.imgRef=this.$refs.editorImage as Element
     },
     computed:{
         projectInfo(){
@@ -147,51 +123,6 @@ export default Vue.extend({
         selectedImageIndex():number{
             return this.projectInfo.selectedImageIndex
         },
-
-        svgScale:function(){
-
-            const width=this.annotationAreaWidth/this.$data.initialSvgWidth
-            const height=this.annotationAreaHeight/this.$data.initialSvgHeight
-
-            return {
-                width,height
-            }
-        },
-
-        widthSvgCoordinate(){
-            console.log("SVG COORDI")
-            const imgRef=this.imgRef
-            if(!imgRef){
-                return
-            }
-            const refEditor=this.$refs.annotationEditor as Element
-            const rect=refEditor.getBoundingClientRect()
-            console.log("WIDTH SVG COORDINATE")
-            console.log(this.canvasWidth)
-            const top=rect.top
-            const left=rect.left
-            const bottom=rect.bottom
-            const right=rect.right
-            console.log("left:",left)
-            const topLeftSvg=this.transformPointSvg(left,top)
-            const topRightSvg=this.transformPointSvg(right,top)
-            console.log("top left ",topLeftSvg)
-            console.log("top right ",topRightSvg)
-            console.log("top right +offsexx ",topRightSvg+rect.left)
-            const svgWidth=topRightSvg.x-topLeftSvg.x
-            const out2=this.transformPointSvg(top,right)
-            console.log("width svg",svgWidth)
-            console.log("width + left",right)
-            // console.log("svg width:",out1.y)
-            // console.log("out2:",out2)
-            return this.transformPointSvg(right,top).x
-            // return topRightSvg.x
-        },
-        heightSvgCoordinate(){
-            const out=this.transformPointSvg(this.canvasWidth,this.canvasHeight) 
-            return out.y
-        },
-
         selectedImageData():IImageData|null{
             if(this.selectedImageIndex===-1){
                 console.log("選択されていない")
@@ -269,8 +200,7 @@ export default Vue.extend({
 
             this.initialSvgWidth=w
             this.initialSvgHeight=h
-            this.canvasWidth=w
-            this.canvasHeight=h
+
         },
         
         //canvaの画像を選択された画像に変更
@@ -305,22 +235,6 @@ export default Vue.extend({
 
             return {width,height}
         },
-        transformPointSvg(x:number,y:number):IPoint{
-            const svg=this.$refs.editorSvg as SVGSVGElement
-            if(!svg){
-                return {x:0,y:0}
-            }
-            const pt=svg.createSVGPoint()
-            if(!pt){
-                return {x:0,y:0}
-            }
-            pt.x=x
-            pt.y=y
-
-            const svgPoint=pt.matrixTransform(svg.getScreenCTM().inverse())
-
-            return {x:svgPoint.x,y:svgPoint.y}
-        },
         boxCreated(args:{startPoint:IPoint,endPoint:IPoint}){
             const {startPoint,endPoint}=args
             console.log("box added")
@@ -337,7 +251,7 @@ export default Vue.extend({
             bbox.ymin=boundingBox.ymin
             bbox.xmax=boundingBox.xmax
             bbox.ymax=boundingBox.ymax
-            
+
         }
     }
 })
