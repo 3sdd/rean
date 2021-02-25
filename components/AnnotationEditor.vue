@@ -340,6 +340,8 @@ export default Vue.extend({
         removeBoundingBox(index:number){
             //選択解除
             this.selectedBoundingBoxIndex=-1
+            this.hoverBoundingBox=false
+
             this.$emit("remove-box",index)
         }
     }
