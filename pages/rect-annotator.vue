@@ -37,7 +37,7 @@
                     :mainImageBase64="mainImageBase64"
                     :imageData="selectedImageData"
                     :selectedImageIndex="selectedImageIndex"
-                    :boundingBoxes="bboxes"
+                    :boundingBoxes.sync="annotationData.boundingBoxes"
                     :selectedBoundingBoxIndex.sync="selectedBoundingBoxIndex"
                     @created-box="boxCreated"
                     @remove-box="removeBoundingBox"
@@ -90,7 +90,7 @@ export default Vue.extend({
 
             defaultLabel:"",
 
-            annotationData:null as AnnotationData|null,
+            annotationData:new AnnotationData(),
             selectedBoundingBoxIndex:-1,//-1は選択されていない状態。
 
             annotationAreaWidth:0,
@@ -113,7 +113,6 @@ export default Vue.extend({
 
         const imageFiles=await ApiManager.readdir(imgRoot)
 
-        this.annotationData=new AnnotationData()
 
         for(const imgFile of imageFiles){
             const imgPath=imgRoot+"\\"+imgFile
@@ -121,6 +120,7 @@ export default Vue.extend({
 
             this.imageDataList.push(imageData)
         }
+        this.annotationData=new AnnotationData()
         //画像0番目表示
         this.imageSelected(0)
         
@@ -325,7 +325,7 @@ export default Vue.extend({
 
             this.addBox(startPoint,endPoint)
 
-            console.log(this.annotationData?.boundingBoxes)
+            this.selectedBoundingBoxIndex=this.annotationData.boundingBoxes.length-1
         },
     }
 })
