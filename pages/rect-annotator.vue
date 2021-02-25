@@ -222,10 +222,7 @@ export default Vue.extend({
         },
         bboxes():BoundingBox[]{
             // @ts-ignore
-            const t=this.annotationData?.boundingBoxes ?? []  as Boundingbox[]
-            console.log("bbox")
-            console.log(t)
-            return t
+            return this.annotationData?.boundingBoxes ?? []  as Boundingbox[]
         }
     },
     methods:{
@@ -415,15 +412,7 @@ export default Vue.extend({
         getBase64Images(){
             return this.imageDataList.map(x=>x.base64image)
         },
-        mouseenterSvgBoundingBox(){
-            this.hoverBoundingBox=true
-        },
-        mouseleaveSvgBoundingBox(){
-            this.hoverBoundingBox=false
-        },
-        mouseoverSvgBoundingBox(){
-            this.hoverBoundingBox=true
-        },
+
         startScaling(index:number,e:any){
             if(this.scaling){
                 return
