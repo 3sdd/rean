@@ -150,16 +150,16 @@ export default Vue.extend({
             this.$emit("remove")
         },
         startDrag(event:MouseEvent){
-            console.log("start drag")
+            // console.log("start drag")
             this.dragged=true
             
         },
         endDrag(event:MouseEvent){
-            console.log("end drag")
+            // console.log("end drag")
             this.dragged=false
         },
         drag(event:MouseEvent){
-            console.log("drag")
+            // console.log("drag")
             if(this.dragged){
                 event.preventDefault()
                 const dragX=event.movementX
@@ -176,11 +176,11 @@ export default Vue.extend({
             this.$emit("click-bounding-box")
         },
         startScalingBoundingBox(index:number){
-            console.log("SCALE start")
+            // console.log("SCALE start")
             this.$emit("start:scale")
         },
         finishScalingBoundingBox(index:number){
-            console.log("SCALE finished")
+            // console.log("SCALE finished")
             this.$emit("finish:scale")
         },
         startScaling(mode:ScaleMode){
