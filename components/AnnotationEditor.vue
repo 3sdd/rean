@@ -55,6 +55,7 @@
                     @click-bounding-box="clickBoundingBox(i)"
                     @remove="removeBoundingBox(i)"
                     @start-scale="startScaling(i,$event)"
+                    @move-bounding-box="moveBoundingBox(i,$event)"
                 >
                 </SvgBoundingBox>
             </g>
@@ -179,11 +180,19 @@ export default Vue.extend({
             const c=this.calculateImageElementSize(this.imageData.imageWidth,this.imageData.imageHeight)
             return c.height
         },
+        xratio(){
+            // @ts-ignore
+            return this.imageElementWidth/this.initialWidth　//横の比率
+        },
+        yratio(){
+            // @ts-ignore
+            return this.imageElementHeight/this.initialHeight
+        },
         //実際の表示にあるようにキャンバスの大きさに合わせてスケールする
         svgCoordinateBoundingBoxes(){
             const bboxes=[] as BoundingBox[]
-            const xratio=this.imageElementWidth/this.initialWidth　//横の比率
-            const yratio=this.imageElementHeight/this.initialHeight //縦の比率
+            const xratio=this.xratio　//横の比率
+            const yratio=this.yratio //縦の比率
             for(const bbox of this.boundingBoxes){
                 const pmin={x:bbox.xmin,y:bbox.ymin}
                 const pmax={x:bbox.xmax,y:bbox.ymax}
@@ -390,7 +399,23 @@ export default Vue.extend({
                     }
                 }
             }
+        },
+        moveBoundingBox(index:number,args:any){
+
+            let {xmin,ymin,xmax,ymax}=args
+            console.log("moooove")
+            console.log(index)
+            console.log(args)
+            xmin/=this.xratio
+            xmax/=this.xratio
+            ymin/=this.yratio
+            ymax/=this.yratio
+
+            const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
+
+            this.$emit("move-bounding-box",index,newBoundingBox)
         }
-    }
+    },
+
 })
 </script>

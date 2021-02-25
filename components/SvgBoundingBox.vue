@@ -166,6 +166,12 @@ export default Vue.extend({
                 const dragY=event.movementY
                 
                 //移動
+                this.$emit("move-bounding-box",{
+                    xmin:this.xmin+dragX,
+                    xmax:this.xmax+dragX,
+                    ymin:this.ymin+dragY,
+                    ymax:this.ymax+dragY
+                })
                 this.$emit("update:xmin",this.xmin+dragX)
                 this.$emit("update:xmax",this.xmax+dragX)
                 this.$emit("update:ymin",this.ymin+dragY)

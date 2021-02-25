@@ -41,6 +41,7 @@
                     :selectedBoundingBoxIndex.sync="selectedBoundingBoxIndex"
                     @created-box="boxCreated"
                     @remove-box="removeBoundingBox"
+                    @move-bounding-box="moveBoundingBox"
                 ></AnnotationEditor>
             </div>
             <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
@@ -289,7 +290,10 @@ export default Vue.extend({
             if(bboxIndex<0){
                 return
             }
-            this.annotationData?.setLabel(bboxIndex,this.classes[index])
+            console.log("clickedddd")
+            console.log(bboxIndex)
+            console.log(this.classes[index])
+            this.annotationData.setLabel(bboxIndex,this.classes[index])
         },
         getBase64Images(){
             return this.imageDataList.map(x=>x.base64image)
@@ -327,6 +331,14 @@ export default Vue.extend({
 
             this.selectedBoundingBoxIndex=this.annotationData.boundingBoxes.length-1
         },
+        moveBoundingBox(index:number,boundingBox:BoundingBox){
+            const bbox=this.annotationData.boundingBoxes[index]
+            bbox.xmin=boundingBox.xmin
+            bbox.ymin=boundingBox.ymin
+            bbox.xmax=boundingBox.xmax
+            bbox.ymax=boundingBox.ymax
+            
+        }
     }
 })
 </script>
