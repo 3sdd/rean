@@ -261,9 +261,11 @@ export default Vue.extend({
 
         mouseenterBoundingBox(){
             this.hoverBoundingBox=true
+            this.showDotLine=false
         },
         mouseleaveBoundingBox(){
             this.hoverBoundingBox=false
+            this.showDotLine=true
         },
         mouseoverBoundingBox(){
             this.hoverBoundingBox=true
