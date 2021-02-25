@@ -80,18 +80,19 @@ export default Vue.extend({
 
             refAnnotationEditor:null as Element|null,
 
+            resizeKey:0,//リサイズするたぶにcomputedのimageElementWidth,heightを更新したので、更新用のキー
         }
     },
     mounted(){
         console.log("MOUTED  annotation editor")
-
         //リサイズ時の処理
+        this.resizeKey=0
         window.addEventListener("resize",this.onResize)
         this.onResize()
 
         this.refAnnotationEditor=this.$refs.annotationEditor as Element
         //TODO:editorの形に収まるようなサイズにする 。現在は画像サイズそのまま
-
+        // @ts-ignore
         console.log(this.calculateImageElementSize())
 
     },
@@ -100,6 +101,9 @@ export default Vue.extend({
             if(!this.imageData){
                 return 0
             }
+            //関数でこのcomputdの値を再計算したので、resizeKeyの値を参照して、数字を上げていくことで強制更新
+            this.resizeKey //TODO:computedを関数から強制的に更新する方法ない？？
+
             // @ts-ignore
             const c=this.calculateImageElementSize(this.imageData.imageWidth,this.imageData.imageHeight)
             return c.width
@@ -108,6 +112,8 @@ export default Vue.extend({
             if(!this.imageData){
                 return 0
             }
+            this.resizeKey//TODO:computedを関数から強制的に更新する方法ない？？
+
             // @ts-ignore
             const c=this.calculateImageElementSize(this.imageData.imageWidth,this.imageData.imageHeight)
             return c.height
@@ -124,60 +130,8 @@ export default Vue.extend({
 
 
         onResize(){
-            // if(!this.imageData){
-            //     return
-            // }
-            // if(!this.refAnnotationEditor){
-            //     return
-            // }
-            // console.log("Resize(AnnotationEditor)")
-            // const targetElem=this.refAnnotationEditor
-
-            // //TODO:targetElem.getClientRect()はwidth,heightはエディター全体の大きさなので、画像サイズは、
-            // //TODO: その全体のwidth,heightどちらかにぴったりとひっついて収まるような大きさなので、その値を求める
-
-            // const editorWidth=targetElem.getBoundingClientRect().width
-            // const editorHeight=targetElem.getBoundingClientRect().height
-
-            // let imgWidth=0
-            // let imgHeight=0
-            
-            // const actualImgWidth=this.imageData.imageWidth
-            // const actualImgHeight=this.imageData.imageHeight
-            // if(actualImgWidth>actualImgHeight){
-            //     imgWidth=editorWidth
-
-            //     const wRatio=editorWidth/actualImgWidth
-            //     imgHeight=actualImgHeight*wRatio
-            //     console.log("WIDTH")
-            //     console.log("actuial img width height",actualImgWidth+","+actualImgHeight)
-            //     console.log("editor width height",editorWidth+","+editorHeight)
-            //     console.log("wratio:",wRatio)
-            //     console.log("img width,img height:",imgWidth+","+imgHeight)
-
-            //     //TODO:変更後のheight>editorHeightの場合
-            //     // if(height>rect.height){
-            //     //     console.log(">>>>")
-            //     // }
-            // }else{
-            //     imgHeight=editorHeight
-
-            //     const hRatio=editorHeight/actualImgHeight
-            //     imgWidth=actualImgHeight*hRatio
-            //     console.log("HEIGHT")
-            //     //TODO:変更後のwidth>editorWidthの場合
-
-            //     // if(width>rect.width){
-            //     //     console.log(">>>>")
-
-            //     // }
-            // }
-
-            // this.canvasWidth=imgWidth
-            // this.canvasHeight=imgHeight
-
-            // this.svgStyleWidth=imgWidth
-            // this.svgStyleHeight=imgHeight
+            this.resizeKey++
+            console.log("resize")
         },
         calculateImageElementSize(imageWidth:number,imageHeight:number):{width:number,height:number}{
             console.log("[calculate]")
