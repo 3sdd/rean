@@ -36,6 +36,8 @@
                 :x1="previewBoxStartPoint.x" :y1="previewBoxStartPoint.y"
                 :x2="svgMouseX" :y2="svgMouseY"
             ></SvgPreviewBox>
+            <text :x="10" :y="20">{{svgMouseX}},{{svgMouseY}}</text>
+            <text :x="10" :y="70">{{makingBox}},{{hoverBoundingBox}}</text>
             <g
                 @mouseenter="mouseenterBoundingBox"
                 @mouseleave="mouseleaveBoundingBox"
@@ -94,6 +96,7 @@ export default Vue.extend({
             required:true
         },
 
+
     },
     data(){
         return {
@@ -112,6 +115,17 @@ export default Vue.extend({
             hoverBoundingBox:false,
 
             selectedBoundingBoxIndex:-1,
+
+            initialWidth:0,
+            initialHeight:0
+        }
+    },
+    watch:{
+        imageData(){
+            this.initialWidth=this.imageElementWidth
+            this.initialHeight=this.imageElementHeight
+            console.log("imageDATA Changed ,w,h=",this.initialWidth+","+this.initialHeight)
+
         }
     },
     mounted(){
@@ -128,6 +142,8 @@ export default Vue.extend({
         console.log(this.imageElementWidth)
         console.log(this.imageElementHeight)
 
+        this.initialWidth=this.imageElementWidth
+        this.initialHeight=this.imageElementHeight
     },
     computed:{
         imageElementWidth(){
@@ -151,15 +167,21 @@ export default Vue.extend({
             const c=this.calculateImageElementSize(this.imageData.imageWidth,this.imageData.imageHeight)
             return c.height
         },
+        //実際の表示にあるようにキャンバスの大きさに合わせてスケールする
         svgCoordinateBoundingBoxes(){
             const bboxes=[] as BoundingBox[]
+            const xratio=this.imageElementWidth/this.initialWidth　//横の比率
+            const yratio=this.imageElementHeight/this.initialHeight //縦の比率
             for(const bbox of this.boundingBoxes){
-                const pmin=this.transformPointSvg(bbox.xmin,bbox.ymin)
-                const pmax=this.transformPointSvg(bbox.xmax,bbox.ymax)
-                const xmin=pmin.x
-                const ymin=pmin.y
-                const xmax=pmax.x
-                const ymax=pmax.y
+                const pmin={x:bbox.xmin,y:bbox.ymin}
+                const pmax={x:bbox.xmax,y:bbox.ymax}
+                console.log(pmin.x,pmin.y,pmax.x,pmax.y)
+                console.log([xratio,yratio])
+                const xmin=pmin.x*xratio
+                const ymin=pmin.y*yratio
+                const xmax=pmax.x*xratio
+                const ymax=pmax.y*yratio
+                console.log([xmin,ymin,xmax,ymax])
                 bboxes.push(new BoundingBox(xmin,ymin,xmax,ymax,bbox.label))
             }
             return bboxes
