@@ -70,6 +70,7 @@ import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { BoundingBox } from '~/utils/annotationData'
 import { IPoint } from '~/utils/utils'
+import { ScaleMode } from '~/utils/scaleMode'
 
 export default Vue.extend({
     components:{
@@ -117,7 +118,13 @@ export default Vue.extend({
             selectedBoundingBoxIndex:-1,
 
             initialWidth:0,
-            initialHeight:0
+            initialHeight:0,
+
+            scale:{
+                isScaling:false,
+                index:-1,
+                mode:"" as ScaleMode|null
+            },
         }
     },
     watch:{
@@ -199,6 +206,8 @@ export default Vue.extend({
         mousemove(e:MouseEvent){
             this.svgMouseX=e.offsetX
             this.svgMouseY=e.offsetY
+
+            this.scaleMain(e)
         },
         mousedown(e:MouseEvent){
             if(!this.hoverBoundingBox && !this.makingBox){
@@ -215,35 +224,25 @@ export default Vue.extend({
                 this.makingBox=false
                 //bounding boxの選択解除
                 const numBboxes=this.boundingBoxes.length
-                this.selectedBoundingBoxIndex=numBboxes-1
 
+                //親側でbounding boxに追加する
                 this.$emit("created-box",{
                     startPoint:{x:this.previewBoxStartPoint.x,
                                 y:this.previewBoxStartPoint.y},
                     endPoint:{x:e.offsetX, y:e.offsetY}
                 })
+                //TODO:this.selectedBoundingBoxIndex=numBboxes-1にしても、選択状態にならない
+                // emitっていつ実行されるの？
+
             }
-            // console.log("mouseup")
-            // if(this.makingRectangle){
-            //     this.makingRectangle=false
-            //     const x=e.offsetX
-            //     const y=e.offsetY
-
-            //     this.rectangle.point2.x=x
-            //     this.rectangle.point2.y=y
-
-            //     this.addBox(this.rectangle.point1,this.rectangle.point2)
-            //     const numBboxes=this.annotationData?.boundingBoxes?.length
-            //     if(numBboxes){
-            //         this.selectedBoundingBox=numBboxes-1 //最後を選択
-            //     }
-            // }if(this.scale.isScaling){
-            //     this.scale={
-            //         isScaling:false,
-            //         index:-1,
-            //         mode:null,
-            //     }
-            // }
+            //スケールしているなら解除
+            if(this.scale.isScaling){
+                this.scale={
+                    isScaling:false,
+                    index:-1,
+                    mode:null,
+                }
+            }
         },
 
         mouseenterBoundingBox(){
@@ -343,6 +342,45 @@ export default Vue.extend({
             this.hoverBoundingBox=false
 
             this.$emit("remove-box",index)
+        },
+        startScaling(index:number,e:any){
+            if(this.scale.isScaling){
+                return
+            }
+            this.scale={
+                isScaling:true,
+                index:index,
+                mode:e
+            }
+        },
+        scaleMain(e:MouseEvent){
+            if(this.scale.isScaling){
+                const bb=this.boundingBoxes[this.scale.index]
+                if(bb){
+                    const mode=this.scale.mode
+                    if(mode==="right"){
+                        bb.xmax=e.offsetX
+                    }else if(mode==="left"){
+                        bb.xmin=e.offsetX
+                    }else if(mode==="up"){
+                        bb.ymin=e.offsetY
+                    }else if(mode==="down"){
+                        bb.ymax=e.offsetY
+                    }else if(mode==="upper-left"){
+                        bb.xmin=e.offsetX
+                        bb.ymin=e.offsetY
+                    }else if(mode==="upper-right"){
+                        bb.xmax=e.offsetX
+                        bb.ymin=e.offsetY
+                    }else if(mode==="lower-right"){
+                        bb.xmax=e.offsetX
+                        bb.ymax=e.offsetY
+                    }else if(mode==="lower-left"){
+                        bb.xmin=e.offsetX
+                        bb.ymax=e.offsetY
+                    }
+                }
+            }
         }
     }
 })
