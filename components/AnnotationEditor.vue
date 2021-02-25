@@ -9,8 +9,8 @@
             />
         </div>
         <div class="z-20 absolute">
-        <!-- <svg :width="svgStyleWidth" :height="svgStyleHeight"
-            :viewBox="`0 0 ${initialSvgWidth} ${initialSvgHeight}`" 
+        <svg :width="imageElementWidth" :height="imageElementHeight"
+            :viewBox="`0 0 ${imageElementWidth} ${imageElementHeight}`" 
             preserveAspectRatio="xMinYMin"
             xmlns="http://www.w3.org/2000/svg"
             style="background-color:rgba(255,255,0,0.5);"
@@ -23,18 +23,20 @@
             @mouseenter="mouseenter"
             @mouseleave="mouseleave"
         >
-            <circle :cx="mouseXSvg" :cy="mouseYSvg" r="10" fill="black"></circle>
+            <circle :cx="0" :cy="0" r="10" fill="black"></circle>
+            <circle :cx="imageElementWidth" :cy="imageElementHeight" r="10" fill="red"></circle>
+
             <SvgCrossLine class="cursor-event-none"
-                :cx="mouseXSvg" :cy="mouseYSvg"
-                :width="widthSvgCoordinate" :height="heightSvgCoordinate"
+                :cx="svgMouseX" :cy="svgMouseY"
+                :width="imageElementWidth" :height="imageElementHeight"
                 :show="showDotLine"
             ></SvgCrossLine>
-            <SvgPreviewBox
+            <!-- <SvgPreviewBox
                 :show="makingRectangle"
                 :x1="rectangle.point1.x" :y1="rectangle.point1.y"
                 :x2="mouseXSvg" :y2="mouseYSvg"
-            ></SvgPreviewBox>
-            <g v-if="annotationData!==null" 
+            ></SvgPreviewBox> -->
+            <!-- <g v-if="annotationData!==null" 
                 @mouseenter="mouseenterSvgBoundingBox"
                 @mouseleave="mouseleaveSvgBoundingBox"
                 @mouseover="mouseoverSvgBoundingBox"
@@ -52,8 +54,8 @@
                     @start-scale="startScaling(i,$event)"
                 >
                 </SvgBoundingBox>
-            </g>
-        </svg> -->
+            </g> -->
+        </svg>
         </div>
     </div>
 </template>
@@ -61,7 +63,11 @@
 <script lang="ts">
 import Vue, {PropType} from 'vue'
 import { IImageData } from '~/utils/imageData'
+import SvgCrossLine from "@/components/SvgCrossLine.vue"
 export default Vue.extend({
+    components:{
+        SvgCrossLine
+    },
     props:{
         mainImageBase64:{
             type:String,
@@ -71,6 +77,10 @@ export default Vue.extend({
             type:Object as PropType<IImageData|null>,
             required:false,
             default:null
+        },
+        selectedImageIndex:{//TODO:keyとして使ってるだけ？いらない？
+            type:Number,
+            required:true,
         }
 
     },
@@ -81,6 +91,9 @@ export default Vue.extend({
             refAnnotationEditor:null as Element|null,
 
             resizeKey:0,//リサイズするたぶにcomputedのimageElementWidth,heightを更新したので、更新用のキー
+            
+            svgMouseX:0,//サポート線の表示に使う マウス位置 x
+            svgMouseY:0 //サポート線の表示に使う マウス位置　y
         }
     },
     mounted(){
@@ -123,9 +136,49 @@ export default Vue.extend({
     methods:{
         mouseenter(e:MouseEvent){
             this.showDotLine=true
+            console.log("[mouseenter]")
         },
         mouseleave(e:MouseEvent){
             this.showDotLine=false
+        },
+        mousemove(e:MouseEvent){
+            this.svgMouseX=e.offsetX
+            this.svgMouseY=e.offsetY
+        },
+        mousedown(e:MouseEvent){
+            // if(!this.hoverBoundingBox && !this.makingRectangle){
+            //     this.makingRectangle=true
+            //     const x=e.offsetX
+            //     const y=e.offsetY
+            //     this.rectangle.point1.x=x
+            //     this.rectangle.point1.y=y
+            //     this.rectangle.point2.x=x
+            //     this.rectangle.point2.y=y
+            // }
+
+        },
+        mouseup(e:MouseEvent){
+            // console.log("mouseup")
+            // if(this.makingRectangle){
+            //     this.makingRectangle=false
+            //     const x=e.offsetX
+            //     const y=e.offsetY
+
+            //     this.rectangle.point2.x=x
+            //     this.rectangle.point2.y=y
+
+            //     this.addBox(this.rectangle.point1,this.rectangle.point2)
+            //     const numBboxes=this.annotationData?.boundingBoxes?.length
+            //     if(numBboxes){
+            //         this.selectedBoundingBox=numBboxes-1 //最後を選択
+            //     }
+            // }if(this.scale.isScaling){
+            //     this.scale={
+            //         isScaling:false,
+            //         index:-1,
+            //         mode:null,
+            //     }
+            // }
         },
 
 

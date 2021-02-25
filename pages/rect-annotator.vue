@@ -39,6 +39,7 @@
                 <AnnotationEditor
                     :mainImageBase64="mainImageBase64"
                     :imageData="selectedImageData"
+                    :selectedImageIndex="selectedImageIndex"
                 ></AnnotationEditor>
             </div>
             <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
