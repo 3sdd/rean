@@ -30,6 +30,7 @@
                     @remove-box="removeBoundingBox"
                     @move-bounding-box="moveBoundingBox"
                     @scale-bounding-box="scaleBoundingBox"
+                    @update-bounding-boxes="updateBoundingBoxes"
                 ></AnnotationEditor>
             </div>
             <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
@@ -254,6 +255,10 @@ export default Vue.extend({
             bbox.ymin=boundingBox.ymin
             bbox.xmax=boundingBox.xmax
             bbox.ymax=boundingBox.ymax
+        },
+        updateBoundingBoxes(newBoundingBoxes:BoundingBox[]){
+            console.log("UPDATE")
+            this.annotationData.boundingBoxes=newBoundingBoxes
         }
     }
 })

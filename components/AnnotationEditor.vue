@@ -204,7 +204,7 @@ export default Vue.extend({
             const bboxes=[] as BoundingBox[]
             const xratio=this.xratio　//横の比率
             const yratio=this.yratio //縦の比率
-            for(const bbox of this.boundingBoxes){
+            for(const bbox of this.internalBoundingBoxes){
                 const pmin={x:bbox.xmin,y:bbox.ymin}
                 const pmax={x:bbox.xmax,y:bbox.ymax}
                 // console.log(pmin.x,pmin.y,pmax.x,pmax.y)
@@ -220,6 +220,45 @@ export default Vue.extend({
         },
         boundingBoxCount(){
             return this.boundingBoxes.length
+        },
+        internalBoundingBoxes:{
+            get:function(){
+                if(!this.imageData){
+                    return []
+                }
+                // 画像上の座標 (0<=x<=image_width,0<=y<=image_height)=> canvasサイズの座標へと変換 (0<=x<=initial_width)
+                const constantX=this.initialWidth/this.imageData.imageWidth
+                const constantY=this.initialHeight/this.imageData.imageHeight
+                const bboxes=[]
+                for(const bbox of this.boundingBoxes){
+                    const newBbox=bbox.clone()
+                    newBbox.xmin*=constantX //TODO:きちんとした値をかける
+                    newBbox.ymin*=constantY
+                    newBbox.xmax*=constantX
+                    newBbox.ymax*=constantY
+                    bboxes.push(newBbox)
+                }
+
+                return bboxes
+            },
+            // set:function(newBoundingBoxes:BoundingBox[]){
+            //     console.log("aaaaaa")
+            //     if(!this.imageData){
+            //         console.error("no image data")
+            //         return
+            //     }
+            //     const constantX=this.imageData.imageWidth/this.initialWidth
+            //     const constantY=this.imageData.imageHeight/this.initialHeight
+
+            //     for(const bbox of newBoundingBoxes){
+            //         bbox.xmin/=constantX
+            //         bbox.ymin/=constantY
+            //         bbox.xmax/=constantX
+            //         bbox.ymax/=constantY
+            //     }
+            //     console.log("UpdateeEeee")
+            //     this.$emit("update-bounding-boxes",newBoundingBoxes)
+            // }
         }
     },
 
@@ -252,12 +291,26 @@ export default Vue.extend({
                 this.makingBox=false
                 //bounding boxの選択解除
                 const numBboxes=this.boundingBoxes.length
+                
+                if(!this.imageData){
+                    console.error("not found imageData")
+                    return
+                }
+                const ratio={
+                    x:this.imageData.imageWidth/this.initialWidth,
+                    y:this.imageData.imageHeight/this.initialHeight,
+                }
+                // //親側でbounding boxに追加する
+                // this.$emit("created-box",{
+                //     startPoint:{x:this.previewBoxStartPoint.x,
+                //                 y:this.previewBoxStartPoint.y},
+                //     endPoint:{x:e.offsetX, y:e.offsetY}
+                // })
 
-                //親側でbounding boxに追加する
                 this.$emit("created-box",{
-                    startPoint:{x:this.previewBoxStartPoint.x,
-                                y:this.previewBoxStartPoint.y},
-                    endPoint:{x:e.offsetX, y:e.offsetY}
+                    startPoint:{x:this.previewBoxStartPoint.x*ratio.x,
+                                y:this.previewBoxStartPoint.y*ratio.y},
+                    endPoint:{x:e.offsetX*ratio.x, y:e.offsetY*ratio.y}
                 })
                 //TODO:this.selectedBoundingBoxIndex=numBboxes-1にしても、選択状態にならない
                 // emitっていつ実行されるの？
@@ -390,28 +443,37 @@ export default Vue.extend({
         scaleMain(e:MouseEvent){
             if(this.scale.isScaling){
                 const bb=this.boundingBoxes[this.scale.index].clone()
+                //TODO:このratio何度もコピペしたのでまとめる。名前考える
+                if(!this.imageData){
+                    console.error("not found imageData")
+                    return
+                }
+                const ratio={
+                    x:this.imageData.imageWidth/this.initialWidth,
+                    y:this.imageData.imageHeight/this.initialHeight,
+                }
                 if(bb){
                     const mode=this.scale.mode
                     if(mode==="right"){
-                        bb.xmax=e.offsetX
+                        bb.xmax=e.offsetX*ratio.x
                     }else if(mode==="left"){
-                        bb.xmin=e.offsetX
+                        bb.xmin=e.offsetX*ratio.x
                     }else if(mode==="up"){
-                        bb.ymin=e.offsetY
+                        bb.ymin=e.offsetY*ratio.y
                     }else if(mode==="down"){
-                        bb.ymax=e.offsetY
+                        bb.ymax=e.offsetY*ratio.y
                     }else if(mode==="upper-left"){
-                        bb.xmin=e.offsetX
-                        bb.ymin=e.offsetY
+                        bb.xmin=e.offsetX*ratio.x
+                        bb.ymin=e.offsetY*ratio.y
                     }else if(mode==="upper-right"){
-                        bb.xmax=e.offsetX
-                        bb.ymin=e.offsetY
+                        bb.xmax=e.offsetX*ratio.x
+                        bb.ymin=e.offsetY*ratio.y
                     }else if(mode==="lower-right"){
-                        bb.xmax=e.offsetX
-                        bb.ymax=e.offsetY
+                        bb.xmax=e.offsetX*ratio.x
+                        bb.ymax=e.offsetY*ratio.y
                     }else if(mode==="lower-left"){
-                        bb.xmin=e.offsetX
-                        bb.ymax=e.offsetY
+                        bb.xmin=e.offsetX*ratio.x
+                        bb.ymax=e.offsetY*ratio.y
                     }
                 }
                 this.$emit("scale-bounding-box",this.scale.index,bb)
@@ -423,6 +485,7 @@ export default Vue.extend({
             let {xmin,ymin,xmax,ymax}=args
             console.log("MOVE")
             console.log(args)
+            // canvasの座標へと変換
             xmin/=this.xratio
             xmax/=this.xratio
             ymin/=this.yratio
@@ -434,10 +497,43 @@ export default Vue.extend({
             xmax=clamp(xmax,0,this.imageElementWidth)
             ymax=clamp(ymax,0,this.imageElementHeight)
 
-            const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
+            if(!this.imageData){
+                console.error("not found imagedata")
+                return
+            }
+            const ratio={
+                x:this.imageData.imageWidth/this.initialWidth,
+                y:this.imageData.imageHeight/this.initialHeight,
+            }
 
+            const newBoundingBox=new BoundingBox(xmin*ratio.x,ymin*ratio.y,xmax*ratio.x,ymax*ratio.y,this.boundingBoxes[index].label)
+            // console.log("new!")
+            // this.updateInternalBoundingBox(index,newBoundingBox)
             this.$emit("move-bounding-box",index,newBoundingBox)
-        }
+        },
+        updateInternalBoundingBox(index:number,boundingBox:BoundingBox){
+            if(!this.imageData){
+                console.error("no image data")
+                return
+            }
+            const constantX=this.imageData.imageWidth/this.initialWidth
+            const constantY=this.imageData.imageHeight/this.initialHeight
+            
+            const bboxes=[]
+            for(let i=0;i<this.boundingBoxes.length;i++){
+                const bbox=this.boundingBoxes[i].clone()
+                if(i===index){
+                    bbox.xmin*=constantX
+                    bbox.ymin*=constantY
+                    bbox.xmax*=constantX
+                    bbox.ymax*=constantY
+                    continue
+                }
+                bboxes.push(bbox)
+            }
+            console.log("UpdateeEeee")
+            this.$emit("update-bounding-boxes",bboxes)
+        },
     },
 
 })
