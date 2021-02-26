@@ -319,7 +319,7 @@ export default Vue.extend({
                 // console.log(this.previewBoxStartPoint)
                 // console.log(e.offsetX,e.offsetY)
                 // console.log(ratio)
-                // this.$emit("created-box",args)
+                this.$emit("created-box",args)
                 //TODO:this.selectedBoundingBoxIndex=numBboxes-1にしても、選択状態にならない
                 // emitっていつ実行されるの？
 
@@ -473,9 +473,11 @@ export default Vue.extend({
         },
 
         moveBoundingBox(index:number,args:any){
+            console.log("MOVE")
 
             let {xmin,ymin,xmax,ymax}=args
             // console.log("MOVE")
+            console.log("svg bbox ")
             console.log(args)
             // canvasの座標へと変換
             xmin/=this.xratio
@@ -483,24 +485,36 @@ export default Vue.extend({
             ymin/=this.yratio
             ymax/=this.yratio
 
-            console.log(xmax)
+            console.log("canvas")
+            console.log({xmin,ymin,xmax,ymax})
+
             xmin=clamp(xmin,0,this.imageElementWidth)
             ymin=clamp(ymin,0,this.imageElementHeight)
             xmax=clamp(xmax,0,this.imageElementWidth)
             ymax=clamp(ymax,0,this.imageElementHeight)
 
+            console.log("canvas(clamp)")
+            console.log({xmin,ymin,xmax,ymax})
+
             if(!this.imageData){
                 console.error("not found imagedata")
                 return
             }
-            console.log("MOVE")
-            console.log([xmin,ymin,xmax,ymax])
             const ratio={
                 x:this.imageData.imageWidth/this.imageElementWidth,
                 y:this.imageData.imageHeight/this.imageElementHeight,
             }
 
-            const newBoundingBox=new BoundingBox(xmin*ratio.x,ymin*ratio.y,xmax*ratio.x,ymax*ratio.y,this.boundingBoxes[index].label)
+            xmin=xmin*ratio.x
+            ymin=ymin*ratio.y
+            xmax=xmax*ratio.x
+            ymax=ymax*ratio.y
+
+            // image
+            console.log("image")
+            console.log({xmin,ymin,xmax,ymax})
+
+            const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
             // console.log("new!")
             // this.updateInternalBoundingBox(index,newBoundingBox)
             this.$emit("move-bounding-box",index,newBoundingBox)
