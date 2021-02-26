@@ -24,11 +24,12 @@
                     :mainImageBase64="mainImageBase64"
                     :imageData="selectedImageData"
                     :selectedImageIndex="selectedImageIndex"
-                    :boundingBoxes.sync="annotationData.boundingBoxes"
+                    :boundingBoxes="annotationData.boundingBoxes"
                     :selectedBoundingBoxIndex.sync="selectedBoundingBoxIndex"
                     @created-box="boxCreated"
                     @remove-box="removeBoundingBox"
                     @move-bounding-box="moveBoundingBox"
+                    @scale-bounding-box="scaleBoundingBox"
                 ></AnnotationEditor>
             </div>
             <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
@@ -166,6 +167,10 @@ export default Vue.extend({
                     alert("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
                     return
                 }
+                //TODO:annotationData.boundingBoxesの座標は画像上での座標ではないので、
+                //変換する必要がある。
+
+
                 const annotation=this.annotationData.toJsonString()
                 console.log(annotation)
                 if(this.annotationData===null){
@@ -237,6 +242,13 @@ export default Vue.extend({
             this.selectedBoundingBoxIndex=this.annotationData.boundingBoxes.length-1
         },
         moveBoundingBox(index:number,boundingBox:BoundingBox){
+            const bbox=this.annotationData.boundingBoxes[index]
+            bbox.xmin=boundingBox.xmin
+            bbox.ymin=boundingBox.ymin
+            bbox.xmax=boundingBox.xmax
+            bbox.ymax=boundingBox.ymax
+        },
+        scaleBoundingBox(index:number,boundingBox:BoundingBox){
             const bbox=this.annotationData.boundingBoxes[index]
             bbox.xmin=boundingBox.xmin
             bbox.ymin=boundingBox.ymin

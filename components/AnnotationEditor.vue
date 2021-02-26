@@ -389,7 +389,7 @@ export default Vue.extend({
         },
         scaleMain(e:MouseEvent){
             if(this.scale.isScaling){
-                const bb=this.boundingBoxes[this.scale.index]
+                const bb=this.boundingBoxes[this.scale.index].clone()
                 if(bb){
                     const mode=this.scale.mode
                     if(mode==="right"){
@@ -414,6 +414,7 @@ export default Vue.extend({
                         bb.ymax=e.offsetY
                     }
                 }
+                this.$emit("scale-bounding-box",this.scale.index,bb)
             }
         },
 

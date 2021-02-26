@@ -34,6 +34,10 @@ export class BoundingBox{
             {x:this.xmin,y:this.ymax}//左下
         ]
     }
+
+    clone():BoundingBox{
+        return new BoundingBox(this.xmin,this.ymin,this.xmax,this.ymax,this.label)
+    }
 }
 
 export class AnnotationData{
