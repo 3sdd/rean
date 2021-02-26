@@ -109,6 +109,11 @@ export default Vue.extend({
                     return
                 }
                 this.imageSelected(this.selectedImageIndex+1)
+            }else if(e.key==="Delete"){
+                if(this.selectedImageIndex===-1){
+                    return
+                }
+                this.removeBoundingBox(this.selectedBoundingBoxIndex)
             }
         })
 
@@ -206,7 +211,7 @@ export default Vue.extend({
         },
         removeBoundingBox(index:number){
             this.annotationData.removeBoundingBox(index)
-            // this.selectedBoundingBoxIndex=-1
+            this.selectedBoundingBoxIndex=-1
         },
         onClickClass(index:number){
             const bboxIndex=this.selectedBoundingBoxIndex

@@ -38,7 +38,9 @@
                 class="cursor-event-none"
             ></SvgPreviewBox>
             <text :x="10" :y="20">{{svgMouseX}},{{svgMouseY}}</text>
-            <text :x="10" :y="70">{{selectedBoundingBoxIndex}}</text>
+            <text :x="10" :y="70">選択中のbbox idnex:{{selectedBoundingBoxIndex}}</text>
+            <text :x="10" :y="100">makingBox:{{makingBox}}</text>
+            <text :x="10" :y="120">hoverBoundingBox:{{hoverBoundingBox}}</text>
             <g
                 @mouseenter="mouseenterBoundingBox"
                 @mouseleave="mouseleaveBoundingBox"
@@ -139,6 +141,12 @@ export default Vue.extend({
             this.initialHeight=this.imageElementHeight
             console.log("imageDATA Changed ,w,h=",this.initialWidth+","+this.initialHeight)
 
+        },
+        boundingBoxCount(newCount,oldCount){
+            if(newCount<oldCount){
+                //bounding boxが削除されたとき
+                this.hoverBoundingBox=false
+            }
         }
     },
     mounted(){
@@ -206,6 +214,9 @@ export default Vue.extend({
                 bboxes.push(new BoundingBox(xmin,ymin,xmax,ymax,bbox.label))
             }
             return bboxes
+        },
+        boundingBoxCount(){
+            return this.boundingBoxes.length
         }
     },
 
