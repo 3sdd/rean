@@ -186,7 +186,7 @@ export default Vue.extend({
 
             //次の画像に変える
             this.$store.commit("project/updateSelectedImage",index)
-
+            this.selectedBoundingBoxIndex=-1
             this.mainImageBase64=this.imageDataList[this.selectedImageIndex].base64image
 
             //TODO:アノテーションファイルのパスの取得関数欲しい
