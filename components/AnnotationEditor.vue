@@ -76,6 +76,17 @@ import { BoundingBox } from '~/utils/annotationData'
 import { IPoint } from '~/utils/utils'
 import { ScaleMode } from '~/utils/scaleMode'
 
+
+function clamp(value:number,min:number,max:number):number{
+    if(value<min){
+        return min
+    }else if(value>max){
+        return max
+    }else{
+        return value
+    }
+}
+
 export default Vue.extend({
     components:{
         SvgCrossLine,
@@ -413,16 +424,22 @@ export default Vue.extend({
                 }
             }
         },
+
         moveBoundingBox(index:number,args:any){
 
             let {xmin,ymin,xmax,ymax}=args
-            console.log("moooove")
-            console.log(index)
+            console.log("MOVE")
             console.log(args)
             xmin/=this.xratio
             xmax/=this.xratio
             ymin/=this.yratio
             ymax/=this.yratio
+
+            console.log(xmax)
+            xmin=clamp(xmin,0,this.imageElementWidth)
+            ymin=clamp(ymin,0,this.imageElementHeight)
+            xmax=clamp(xmax,0,this.imageElementWidth)
+            ymax=clamp(ymax,0,this.imageElementHeight)
 
             const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
 
