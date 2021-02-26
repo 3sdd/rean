@@ -73,19 +73,11 @@ import SvgCrossLine from "@/components/SvgCrossLine.vue"
 import SvgPreviewBox from "@/components/SvgPreviewBox.vue"
 import SvgBoundingBox from "@/components/SvgBoundingBox.vue"
 import { BoundingBox } from '~/utils/annotationData'
-import { IPoint } from '~/utils/utils'
+import { IPoint,clamp } from '~/utils/utils'
 import { ScaleMode } from '~/utils/scaleMode'
 
 
-function clamp(value:number,min:number,max:number):number{
-    if(value<min){
-        return min
-    }else if(value>max){
-        return max
-    }else{
-        return value
-    }
-}
+
 
 export default Vue.extend({
     components:{
