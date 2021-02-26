@@ -1,5 +1,8 @@
 <template>
-    <div class="h-screen flex flex-col bg-red-200">
+    <div class="h-screen flex flex-col bg-red-200"
+        ref="annotationPage"
+        tabindex="0"
+    >
 
         <div class="p-2 bg-blue-200">
             <p>残り枚数 10000枚</p>
@@ -90,6 +93,25 @@ export default Vue.extend({
         this.annotationData=new AnnotationData()
         //画像0番目表示
         this.imageSelected(0)
+
+        //ショートカット登録
+        const refAnnotationPage=this.$refs.annotationPage as HTMLElement
+        refAnnotationPage.addEventListener("keydown",(e:KeyboardEvent)=>{
+            if(e.key==="a"){
+                if(this.selectedImageIndex-1<0){
+                    alert("最初の画像です。前に戻れません。")
+                    return
+                }
+                this.imageSelected(this.selectedImageIndex-1)
+            }else if(e.key==="d"){
+                if(this.selectedImageIndex+1>=this.imageDataList.length){
+                    alert("最後の画像です。次に進めません。")
+                    return
+                }
+                this.imageSelected(this.selectedImageIndex+1)
+            }
+        })
+
         
     },
     computed:{
@@ -160,7 +182,8 @@ export default Vue.extend({
             //次の画像に変える
             this.$store.commit("project/updateSelectedImage",index)
 
-            this.changeImage(this.selectedImageIndex)
+            this.mainImageBase64=this.imageDataList[this.selectedImageIndex].base64image
+
             //TODO:アノテーションファイルのパスの取得関数欲しい
             const nextImageData=this.imageDataList[index]
             const nextAnnotationPath=annotationRootPath+"\\"+`${nextImageData.filename}.json`
@@ -176,11 +199,6 @@ export default Vue.extend({
                 this.annotationData.imageWidth=nextImageData.imageWidth
                 this.annotationData.imageHeight=nextImageData.imageHeight
             }
-        },
-        
-        //canvaの画像を選択された画像に変更
-        changeImage(index:number){
-            this.mainImageBase64=this.imageDataList[index].base64image
         },
         addBox(point1:IPoint,point2:IPoint){
             const boundingBox=BoundingBox.fromTwoPoints(point1,point2,this.defaultLabel)
