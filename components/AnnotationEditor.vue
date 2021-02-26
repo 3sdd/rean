@@ -406,22 +406,6 @@ export default Vue.extend({
 
             return {width:imgWidth,height:imgHeight}
         },
-        transformPointSvg(x:number,y:number):IPoint{
-            const svg=this.$refs.editorSvg as SVGSVGElement
-            if(!svg){
-                return {x:0,y:0}
-            }
-            const pt=svg.createSVGPoint()
-            if(!pt){
-                return {x:0,y:0}
-            }
-            pt.x=x
-            pt.y=y
-            // @ts-ignore
-            const svgPoint=pt.matrixTransform(svg.getScreenCTM().inverse())
-
-            return {x:svgPoint.x,y:svgPoint.y}
-        },
         removeBoundingBox(index:number){
             //選択解除
             this.$emit("update:selectedBoundingBoxIndex",-1)
