@@ -234,9 +234,9 @@ export default Vue.extend({
         },
         boxCreated(args:{startPoint:IPoint,endPoint:IPoint}){
             const {startPoint,endPoint}=args
-            console.log("box added")
-            console.log(startPoint)
-            console.log(endPoint)
+            // console.log("[page]box added (startpoint,endpoint)=")
+            // console.log(startPoint)
+            // console.log(endPoint)
 
             this.addBox(startPoint,endPoint)
 

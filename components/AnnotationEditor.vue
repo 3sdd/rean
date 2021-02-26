@@ -37,10 +37,15 @@
                 :x2="svgMouseX" :y2="svgMouseY"
                 class="cursor-event-none"
             ></SvgPreviewBox>
-            <text :x="10" :y="20">{{svgMouseX}},{{svgMouseY}}</text>
-            <text :x="10" :y="70">選択中のbbox idnex:{{selectedBoundingBoxIndex}}</text>
-            <text :x="10" :y="100">makingBox:{{makingBox}}</text>
-            <text :x="10" :y="120">hoverBoundingBox:{{hoverBoundingBox}}</text>
+            <g > 
+                <text :x="10" :y="20">{{svgMouseX}},{{svgMouseY}}</text>
+                <text :x="10" :y="70">選択中のbbox idnex:{{selectedBoundingBoxIndex}}</text>
+                <text :x="10" :y="100">makingBox:{{makingBox}}</text>
+                <text :x="10" :y="120">hoverBoundingBox:{{hoverBoundingBox}}</text>
+                <text :x="10" :y="170">initial w,h=({{initialWidth}},{{initialHeight}})</text>
+                <!-- <text :x="10" :y="170">startPoint:{{startPoint}}</text>
+                <text :x="10" :y="190">endPoint:{{startPoint}}</text> -->
+            </g>
             <g
                 @mouseenter="mouseenterBoundingBox"
                 @mouseleave="mouseleaveBoundingBox"
@@ -265,7 +270,7 @@ export default Vue.extend({
     methods:{
         mouseenter(e:MouseEvent){
             this.showDotLine=true
-            console.log("[mouseenter]")
+            // console.log("[mouseenter]")
         },
         mouseleave(e:MouseEvent){
             this.showDotLine=false
@@ -282,8 +287,6 @@ export default Vue.extend({
                 this.previewBoxStartPoint={
                     x:e.offsetX,y:e.offsetY
                 }
-                console.log("start creating box")
-                console.log(this.previewBoxStartPoint)
             }
         },
         mouseup(e:MouseEvent){
@@ -292,13 +295,14 @@ export default Vue.extend({
                 //bounding boxの選択解除
                 const numBboxes=this.boundingBoxes.length
                 
+                //画像の座標に変換
                 if(!this.imageData){
                     console.error("not found imageData")
                     return
                 }
                 const ratio={
-                    x:this.imageData.imageWidth/this.initialWidth,
-                    y:this.imageData.imageHeight/this.initialHeight,
+                    x:this.imageData.imageWidth/this.imageElementWidth,
+                    y:this.imageData.imageHeight/this.imageElementHeight,
                 }
                 // //親側でbounding boxに追加する
                 // this.$emit("created-box",{
@@ -306,12 +310,16 @@ export default Vue.extend({
                 //                 y:this.previewBoxStartPoint.y},
                 //     endPoint:{x:e.offsetX, y:e.offsetY}
                 // })
-
-                this.$emit("created-box",{
+                const args={
                     startPoint:{x:this.previewBoxStartPoint.x*ratio.x,
                                 y:this.previewBoxStartPoint.y*ratio.y},
                     endPoint:{x:e.offsetX*ratio.x, y:e.offsetY*ratio.y}
-                })
+                }
+                // console.log("[child] box created")
+                // console.log(this.previewBoxStartPoint)
+                // console.log(e.offsetX,e.offsetY)
+                // console.log(ratio)
+                // this.$emit("created-box",args)
                 //TODO:this.selectedBoundingBoxIndex=numBboxes-1にしても、選択状態にならない
                 // emitっていつ実行されるの？
 
@@ -344,10 +352,10 @@ export default Vue.extend({
 
         onResize(){
             this.resizeKey++
-            console.log("resize")
+            // console.log("resize")
         },
         calculateImageElementSize(imageWidth:number,imageHeight:number){
-            console.log("[calculate]")
+            // console.log("[calculate]")
             if(!this.refAnnotationEditor){
                 return {width:0,height:0}
             }
@@ -359,7 +367,7 @@ export default Vue.extend({
             const editorWidth=editorRect.width
             const editorHeight=editorRect.height
 
-            console.log("[calculate] editor (w,h)=",editorWidth+","+editorHeight)
+            // console.log("[calculate] editor (w,h)=",editorWidth+","+editorHeight)
 
             let imgWidth=0
             let imgHeight=0
@@ -373,31 +381,31 @@ export default Vue.extend({
 
                 const wRatio=editorWidth/actualImgWidth
                 imgHeight=actualImgHeight*wRatio
-                console.log("[calculate]imagewidth>imageHeight")
-                console.log("[calculate]wratio:",wRatio)
-                console.log(`(w,h):${actualImgWidth},${actualImgHeight} => ${imgWidth},${imgHeight}`)
+                // console.log("[calculate]imagewidth>imageHeight")
+                // console.log("[calculate]wratio:",wRatio)
+                // console.log(`(w,h):${actualImgWidth},${actualImgHeight} => ${imgWidth},${imgHeight}`)
 
                 //TODO:変更後のheight>editorHeightの場合
                 if(imgHeight>editorHeight){
-                    console.log(">>>>")
+                    // console.log(">>>>")
                     const hRatio=editorHeight/imgHeight
                     imgHeight=editorHeight
                     imgWidth=imgWidth*hRatio
-                    console.log("[calculate]hratio:",hRatio)
-                    console.log("[calaculate]img w,h=",imgWidth+","+imgHeight)
+                    // console.log("[calculate]hratio:",hRatio)
+                    // console.log("[calaculate]img w,h=",imgWidth+","+imgHeight)
                 }
             }else{
                 imgHeight=editorHeight
 
                 const hRatio=editorHeight/actualImgHeight
                 imgWidth=actualImgWidth*hRatio
-                console.log("[calculate]imagewidth<imageHeight")
-                console.log("[calculate]hratio:",hRatio)
-                console.log(`(w,h):${actualImgWidth},${actualImgHeight} => ${imgWidth},${imgHeight}`)
+                // console.log("[calculate]imagewidth<imageHeight")
+                // console.log("[calculate]hratio:",hRatio)
+                // console.log(`(w,h):${actualImgWidth},${actualImgHeight} => ${imgWidth},${imgHeight}`)
                 //TODO:変更後のwidth>editorWidthの場合
 
                 if(imgWidth>editorWidth){
-                    console.log(">>>>>+")
+                    // console.log(">>>>>+")
                     const wRatio=editorWidth/imgWidth
                     imgWidth=editorWidth
                     imgHeight=imgHeight*wRatio
@@ -433,8 +441,8 @@ export default Vue.extend({
                     return
                 }
                 const ratio={
-                    x:this.imageData.imageWidth/this.initialWidth,
-                    y:this.imageData.imageHeight/this.initialHeight,
+                    x:this.imageData.imageWidth/this.imageElementWidth,
+                    y:this.imageData.imageHeight/this.imageElementHeight,
                 }
                 if(bb){
                     const mode=this.scale.mode
@@ -467,7 +475,7 @@ export default Vue.extend({
         moveBoundingBox(index:number,args:any){
 
             let {xmin,ymin,xmax,ymax}=args
-            console.log("MOVE")
+            // console.log("MOVE")
             console.log(args)
             // canvasの座標へと変換
             xmin/=this.xratio
@@ -485,9 +493,11 @@ export default Vue.extend({
                 console.error("not found imagedata")
                 return
             }
+            console.log("MOVE")
+            console.log([xmin,ymin,xmax,ymax])
             const ratio={
-                x:this.imageData.imageWidth/this.initialWidth,
-                y:this.imageData.imageHeight/this.initialHeight,
+                x:this.imageData.imageWidth/this.imageElementWidth,
+                y:this.imageData.imageHeight/this.imageElementHeight,
             }
 
             const newBoundingBox=new BoundingBox(xmin*ratio.x,ymin*ratio.y,xmax*ratio.x,ymax*ratio.y,this.boundingBoxes[index].label)
