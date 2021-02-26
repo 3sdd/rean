@@ -172,10 +172,10 @@ export default Vue.extend({
                     ymin:this.ymin+dragY,
                     ymax:this.ymax+dragY
                 })
-                this.$emit("update:xmin",this.xmin+dragX)
-                this.$emit("update:xmax",this.xmax+dragX)
-                this.$emit("update:ymin",this.ymin+dragY)
-                this.$emit("update:ymax",this.ymax+dragY)
+                // this.$emit("update:xmin",this.xmin+dragX)
+                // this.$emit("update:xmax",this.xmax+dragX)
+                // this.$emit("update:ymin",this.ymin+dragY)
+                // this.$emit("update:ymax",this.ymax+dragY)
             }
         },
         clickBoundingBox(){
