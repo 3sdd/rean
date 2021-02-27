@@ -474,11 +474,11 @@ export default Vue.extend({
         },
 
         moveBoundingBox(index:number,delta:{deltaX:number,deltaY:number}){
-            console.log("MOVE")
+            // console.log("MOVE")
 
             // let {xmin,ymin,xmax,ymax}=args
             // console.log("MOVE")
-            console.log("svg bbox ")
+            // console.log("svg bbox ")
             // console.log(args)
             if(!this.imageData){
                 console.error("not found imageData")
@@ -493,16 +493,14 @@ export default Vue.extend({
             let ymin=bbox.ymin
             let xmax=bbox.xmax
             let ymax=bbox.ymax
-            console.log("bbox position")
-            console.log({xmin,ymin,xmax,ymax})
-            console.log("delta")
-            console.log(delta)
-            console.log("ratio")
-            console.log(ratio)
+            // console.log("bbox position")
+            // console.log({xmin,ymin,xmax,ymax})
+            // console.log("delta")
+            // console.log(delta)
+            // console.log("ratio")
+            // console.log(ratio)
 
 
-            //TODO: deltaを使って移動処理
-            // return this.imageElementWidth/this.initialWidth　//横の比率
             xmin+=delta.deltaX/this.xratio
             ymin+=delta.deltaY/this.yratio
             xmax+=delta.deltaX/this.xratio
@@ -510,44 +508,21 @@ export default Vue.extend({
 
             const xratio=this.imageData.imageWidth/this.initialWidth
             const yratio=this.imageData.imageHeight/this.initialHeight
-
             xmin*=xratio
             xmax*=xratio
             ymin*=yratio
             ymax*=yratio
-            // const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
-
-
-            // // canvasの座標へと変換
-            // // xmin/=this.xratio
-            // // xmax/=this.xratio
-            // // ymin/=this.yratio
-            // // ymax/=this.yratio
-
-            // console.log("canvas")
-            // console.log({xmin,ymin,xmax,ymax})
-
-            // xmin=clamp(xmin,0,this.imageElementWidth)
-            // ymin=clamp(ymin,0,this.imageElementHeight)
-            // xmax=clamp(xmax,0,this.imageElementWidth)
-            // ymax=clamp(ymax,0,this.imageElementHeight)
-
-            // console.log("canvas(clamp)")
-            // console.log({xmin,ymin,xmax,ymax})
-
-
-            // xmin=xmin*ratio.x
-            // ymin=ymin*ratio.y
-            // xmax=xmax*ratio.x
-            // ymax=ymax*ratio.y
-
-            // // image
-            // console.log("image")
-            // console.log({xmin,ymin,xmax,ymax})
+        
+            xmin=clamp(xmin,0,this.imageData.imageWidth)
+            ymin=clamp(ymin,0,this.imageData.imageHeight)
+            xmax=clamp(xmax,0,this.imageData.imageWidth)
+            ymax=clamp(ymax,0,this.imageData.imageHeight)
 
             const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
             // console.log("new!")
             // this.updateInternalBoundingBox(index,newBoundingBox)
+            
+            //newBoundingBoxは画像上の座標 x,yの範囲はそれぞれ [0,image_width],[0,image_height]
             this.$emit("move-bounding-box",index,newBoundingBox)
         },
         updateInternalBoundingBox(index:number,boundingBox:BoundingBox){
