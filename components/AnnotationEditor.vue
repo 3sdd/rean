@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-red-500 flex justify-center items-center relative w-full h-full"
+    <div class="flex justify-center items-center relative w-full h-full"
         ref="annotationEditor"
     >
         <div class="z-10 absolute">

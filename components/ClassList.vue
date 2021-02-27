@@ -1,9 +1,9 @@
 <template>
     <div>
         <h2 class="font-bold text-white mb-3">タグ</h2>
-        <div class="text-white">
+        <div>
             <div v-for="(className,i) in classes" :key="'class'+i"
-                class="p-1 border border-gray-400 hover:bg-purple-400"
+                class="p-1 border border-gray-400 hover:bg-gray-500 hover:text-white"
                 @click="onClick(i)"
             >
                 {{className}}

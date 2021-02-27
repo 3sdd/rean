@@ -1,13 +1,12 @@
 <template>
-    <div class="h-screen flex flex-col bg-red-200"
+    <div class="h-screen flex flex-col bg-gray-600"
         ref="annotationPage"
         tabindex="0"
     >
-
-        <div class="p-2 bg-blue-200">
+        <div class="p-2 bg-gray-300">
             <p>残り枚数 10000枚</p>
         </div>
-        <div class="flex-1 flex flex-row bg-blue-400 overflow-y-auto">
+        <div class="flex-1 flex flex-row overflow-y-auto bg-white">
             <div class="w-60 overflow-y-auto p-1 flex-shrink-0">
                 <div class="mx-auto text-center font-bold text-white mb-5">
                     
@@ -19,7 +18,7 @@
                 >
                 </ThumbnailViewer>
             </div>
-            <div class="flex-1 bg-purple-300">
+            <div class="flex-1 bg-gray-700">
                 <AnnotationEditor
                     :mainImageBase64="mainImageBase64"
                     :imageData="selectedImageData"
@@ -33,7 +32,7 @@
                     @update-bounding-boxes="updateBoundingBoxes"
                 ></AnnotationEditor>
             </div>
-            <div class="w-48 bg-purple-600 p-2 flex-shrink-0">
+            <div class="w-48 p-2 flex-shrink-0 bg-white">
                 <ClassList :classes="classes"
                     @class-clicked="onClickClass"
                 ></ClassList>
