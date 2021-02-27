@@ -3,7 +3,7 @@
     <div>
       <nuxt-link to="/create-project" class="block">プロジェクト作成</nuxt-link>
       <nuxt-link to="/open-project" class="block">プロジェクトを開く</nuxt-link>
-      <nuxt-link to="/rect-annotator" class="block">debug＿アノテーションページ</nuxt-link>
+      <!-- <nuxt-link to="/rect-annotator" class="block">debug＿アノテーションページ</nuxt-link> -->
     </div>
   </div>
 </template>

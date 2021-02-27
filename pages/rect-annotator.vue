@@ -125,7 +125,7 @@ export default Vue.extend({
             return this.$store.state.project.projectInfo as ProjectInfo
         },
         rootPath(){
-            const _useTestProject=true
+            const _useTestProject=false
             if(_useTestProject){
                 return "./TestProject"
             }
