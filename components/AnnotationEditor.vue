@@ -13,7 +13,6 @@
             :viewBox="`0 0 ${imageElementWidth} ${imageElementHeight}`" 
             preserveAspectRatio="xMinYMin"
             xmlns="http://www.w3.org/2000/svg"
-            style="background-color:rgba(255,255,0,0.5);"
             :key="selectedImageIndex"
             ref="editorSvg"
 
@@ -23,8 +22,8 @@
             @mouseenter="mouseenter"
             @mouseleave="mouseleave"
         >
-            <circle :cx="0" :cy="0" r="10" fill="black"></circle>
-            <circle :cx="imageElementWidth" :cy="imageElementHeight" r="10" fill="red"></circle>
+            <!-- <circle :cx="0" :cy="0" r="10" fill="black"></circle>
+            <circle :cx="imageElementWidth" :cy="imageElementHeight" r="10" fill="red"></circle> -->
 
             <SvgCrossLine class="cursor-event-none"
                 :cx="svgMouseX" :cy="svgMouseY"
@@ -37,7 +36,7 @@
                 :x2="svgMouseX" :y2="svgMouseY"
                 class="cursor-event-none"
             ></SvgPreviewBox>
-            <g > 
+            <g v-if="showDebugText"> 
                 <text :x="10" :y="20">{{svgMouseX}},{{svgMouseY}}</text>
                 <text :x="10" :y="70">選択中のbbox idnex:{{selectedBoundingBoxIndex}}</text>
                 <text :x="10" :y="100">makingBox:{{makingBox}}</text>
@@ -142,6 +141,8 @@ export default Vue.extend({
                 index:-1,
                 mode:"" as ScaleMode|null
             },
+
+            showDebugText:false,
         }
     },
     watch:{
