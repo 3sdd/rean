@@ -160,6 +160,7 @@ export default Vue.extend({
         },
         drag(event:MouseEvent){
             // console.log("drag")
+            //TODO:?上のannotation editor側でするべき？
             if(this.dragged){
                 event.preventDefault()
                 const dragX=event.movementX
@@ -167,10 +168,12 @@ export default Vue.extend({
                 
                 //移動
                 this.$emit("move-bounding-box",{
-                    xmin:this.xmin+dragX,
-                    xmax:this.xmax+dragX,
-                    ymin:this.ymin+dragY,
-                    ymax:this.ymax+dragY
+                    // xmin:this.xmin+dragX,
+                    // xmax:this.xmax+dragX,
+                    // ymin:this.ymin+dragY,
+                    // ymax:this.ymax+dragY,
+                    deltaX:dragX,
+                    deltaY:dragY
                 })
                 // this.$emit("update:xmin",this.xmin+dragX)
                 // this.$emit("update:xmax",this.xmax+dragX)

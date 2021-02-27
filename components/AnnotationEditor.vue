@@ -43,6 +43,7 @@
                 <text :x="10" :y="100">makingBox:{{makingBox}}</text>
                 <text :x="10" :y="120">hoverBoundingBox:{{hoverBoundingBox}}</text>
                 <text :x="10" :y="170">initial w,h=({{initialWidth}},{{initialHeight}})</text>
+                <text :x="10" :y="190">xratio,yratio=({{xratio}},{{yratio}})</text>
                 <!-- <text :x="10" :y="170">startPoint:{{startPoint}}</text>
                 <text :x="10" :y="190">endPoint:{{startPoint}}</text> -->
             </g>
@@ -472,47 +473,77 @@ export default Vue.extend({
             }
         },
 
-        moveBoundingBox(index:number,args:any){
+        moveBoundingBox(index:number,delta:{deltaX:number,deltaY:number}){
             console.log("MOVE")
 
-            let {xmin,ymin,xmax,ymax}=args
+            // let {xmin,ymin,xmax,ymax}=args
             // console.log("MOVE")
             console.log("svg bbox ")
-            console.log(args)
-            // canvasの座標へと変換
-            xmin/=this.xratio
-            xmax/=this.xratio
-            ymin/=this.yratio
-            ymax/=this.yratio
-
-            console.log("canvas")
-            console.log({xmin,ymin,xmax,ymax})
-
-            xmin=clamp(xmin,0,this.imageElementWidth)
-            ymin=clamp(ymin,0,this.imageElementHeight)
-            xmax=clamp(xmax,0,this.imageElementWidth)
-            ymax=clamp(ymax,0,this.imageElementHeight)
-
-            console.log("canvas(clamp)")
-            console.log({xmin,ymin,xmax,ymax})
-
+            // console.log(args)
             if(!this.imageData){
-                console.error("not found imagedata")
+                console.error("not found imageData")
                 return
             }
             const ratio={
-                x:this.imageData.imageWidth/this.imageElementWidth,
+                x:this.initialWidth/this.imageElementWidth,
                 y:this.imageData.imageHeight/this.imageElementHeight,
             }
-
-            xmin=xmin*ratio.x
-            ymin=ymin*ratio.y
-            xmax=xmax*ratio.x
-            ymax=ymax*ratio.y
-
-            // image
-            console.log("image")
+            const bbox=this.internalBoundingBoxes[index]
+            let xmin=bbox.xmin
+            let ymin=bbox.ymin
+            let xmax=bbox.xmax
+            let ymax=bbox.ymax
+            console.log("bbox position")
             console.log({xmin,ymin,xmax,ymax})
+            console.log("delta")
+            console.log(delta)
+            console.log("ratio")
+            console.log(ratio)
+
+
+            //TODO: deltaを使って移動処理
+            // return this.imageElementWidth/this.initialWidth　//横の比率
+            xmin+=delta.deltaX/this.xratio
+            ymin+=delta.deltaY/this.yratio
+            xmax+=delta.deltaX/this.xratio
+            ymax+=delta.deltaY/this.yratio
+
+            const xratio=this.imageData.imageWidth/this.initialWidth
+            const yratio=this.imageData.imageHeight/this.initialHeight
+
+            xmin*=xratio
+            xmax*=xratio
+            ymin*=yratio
+            ymax*=yratio
+            // const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
+
+
+            // // canvasの座標へと変換
+            // // xmin/=this.xratio
+            // // xmax/=this.xratio
+            // // ymin/=this.yratio
+            // // ymax/=this.yratio
+
+            // console.log("canvas")
+            // console.log({xmin,ymin,xmax,ymax})
+
+            // xmin=clamp(xmin,0,this.imageElementWidth)
+            // ymin=clamp(ymin,0,this.imageElementHeight)
+            // xmax=clamp(xmax,0,this.imageElementWidth)
+            // ymax=clamp(ymax,0,this.imageElementHeight)
+
+            // console.log("canvas(clamp)")
+            // console.log({xmin,ymin,xmax,ymax})
+
+
+            // xmin=xmin*ratio.x
+            // ymin=ymin*ratio.y
+            // xmax=xmax*ratio.x
+            // ymax=ymax*ratio.y
+
+            // // image
+            // console.log("image")
+            // console.log({xmin,ymin,xmax,ymax})
 
             const newBoundingBox=new BoundingBox(xmin,ymin,xmax,ymax,this.boundingBoxes[index].label)
             // console.log("new!")
