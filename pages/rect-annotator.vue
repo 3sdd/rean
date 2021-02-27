@@ -139,7 +139,7 @@ export default Vue.extend({
         },
         selectedImageData():IImageData|null{
             if(this.selectedImageIndex===-1){
-                console.log("選択されていない")
+                // console.log("選択されていない")
                 return null
             }
             const d=this.imageDataList[this.selectedImageIndex]
@@ -172,7 +172,7 @@ export default Vue.extend({
 
 
                 const annotation=this.annotationData.toJsonString()
-                console.log(annotation)
+                // console.log(annotation)
                 if(this.annotationData===null){
                     console.error("no annotation data")
                 }
@@ -201,8 +201,8 @@ export default Vue.extend({
             if(existsAnnotation){
                 const jsonString=await ApiManager.readFile(nextAnnotationPath)
                 this.annotationData=AnnotationData.fromJsonString(jsonString)
-                console.log("aruyo")
-                console.log(jsonString)
+                // console.log("aruyo")
+                // console.log(jsonString)
 
             }else{
                 this.annotationData=new AnnotationData()
@@ -223,9 +223,9 @@ export default Vue.extend({
             if(bboxIndex<0){
                 return
             }
-            console.log("clickedddd")
-            console.log(bboxIndex)
-            console.log(this.classes[index])
+            // console.log("clickedddd")
+            // console.log(bboxIndex)
+            // console.log(this.classes[index])
             this.annotationData.setLabel(bboxIndex,this.classes[index])
         },
         getBase64Images(){
@@ -256,7 +256,7 @@ export default Vue.extend({
             bbox.ymax=boundingBox.ymax
         },
         updateBoundingBoxes(newBoundingBoxes:BoundingBox[]){
-            console.log("UPDATE")
+            // console.log("UPDATE")
             this.annotationData.boundingBoxes=newBoundingBoxes
         }
     }

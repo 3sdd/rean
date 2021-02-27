@@ -35,7 +35,7 @@ export default Vue.extend({
                 defaultPath:this.projectRootPath,
                 properties:["openDirectory"]
             })
-            console.log(result)
+            // console.log(result)
             if(result.canceled){
                 return
             }

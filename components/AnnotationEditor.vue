@@ -149,7 +149,7 @@ export default Vue.extend({
         imageData(){
             this.initialWidth=this.imageElementWidth
             this.initialHeight=this.imageElementHeight
-            console.log("imageDATA Changed ,w,h=",this.initialWidth+","+this.initialHeight)
+            // console.log("imageDATA Changed ,w,h=",this.initialWidth+","+this.initialHeight)
 
         },
         boundingBoxCount(newCount,oldCount){
@@ -160,7 +160,7 @@ export default Vue.extend({
         }
     },
     mounted(){
-        console.log("MOUTED  annotation editor")
+        // console.log("MOUTED  annotation editor")
         //リサイズ時の処理
         this.resizeKey=0
         window.addEventListener("resize",this.onResize)
@@ -168,10 +168,10 @@ export default Vue.extend({
 
         this.refAnnotationEditor=this.$refs.annotationEditor as Element
         //TODO:editorの形に収まるようなサイズにする 。現在は画像サイズそのまま
-        // @ts-ignore
-        console.log(this.calculateImageElementSize())
-        console.log(this.imageElementWidth)
-        console.log(this.imageElementHeight)
+        // // @ts-ignore
+        // console.log(this.calculateImageElementSize())
+        // console.log(this.imageElementWidth)
+        // console.log(this.imageElementHeight)
 
         this.initialWidth=this.imageElementWidth
         this.initialHeight=this.imageElementHeight

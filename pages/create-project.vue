@@ -49,7 +49,7 @@ export default Vue.extend({
             //TODO:2回目の作成ボタン押したときに重複して作らないようにする
             const projectName=this.projectName
             const location=this.location
-            console.log(location)
+            // console.log(location)
 
             if(projectName===""){
                 //TODO:alertではだめ？
@@ -86,7 +86,7 @@ export default Vue.extend({
                 defaultPath:this.location,
                 properties:["openDirectory"]
             })
-            console.log(result)
+            // console.log(result)
             if(result.canceled){
                 return
             }

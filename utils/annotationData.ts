@@ -84,7 +84,7 @@ export class AnnotationData{
         const d= new AnnotationData()
         d.imageWidth=j.imageWidth
         d.imageHeight=j.imageHeight
-        console.log(j)
+        // console.log(j)
         for(const bbox of j.boundingBoxes){
             d.addBoundingBox(new BoundingBox(bbox.xmin,bbox.ymin,bbox.xmax,bbox.ymax,bbox.label))
         }
