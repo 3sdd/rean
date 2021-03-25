@@ -108,6 +108,12 @@ function joinPath(event,args){
     const {paths}=args
     return path.join(...paths)
 }
+
+function resolvePath(event,args){
+    const {paths}=args
+    return path.resolve(...paths)
+}
+
 module.exports={
     existsPath,
     mkdir,
@@ -121,5 +127,6 @@ module.exports={
     readImageData,
     writeFile,
     readFile,
-    joinPath
+    joinPath,
+    resolvePath
 }
