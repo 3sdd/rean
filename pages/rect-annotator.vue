@@ -159,34 +159,40 @@ export default Vue.extend({
             //アノテーションデータを保存する (前の画像があるとき)
 
             if(previousSelectedImageIndex!==-1){  //前の選択画像があるとき
-                //TODO:アノテーションファイルのパスの取得関数欲しい
-                const filename=this.imageDataList[previousSelectedImageIndex].filename
-                const annotationPath=annotationRootPath+"\\"+`${filename}.json`
-                //アノテーションのフォルダがない時はアラートを表示する
-                if(! (await ApiManager.existsPath(annotationRootPath))){
-                    alert("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
+                // //TODO:アノテーションファイルのパスの取得関数欲しい
+                // const filename=this.imageDataList[previousSelectedImageIndex].filename
+                // const annotationPath=annotationRootPath+"\\"+`${filename}.json`
+                // //アノテーションのフォルダがない時はアラートを表示する
+                // if(! (await ApiManager.existsPath(annotationRootPath))){
+                //     alert("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
+                //     return
+                // }
+                // //TODO:annotationData.boundingBoxesの座標は画像上での座標ではないので、
+                // //変換する必要がある。
+
+
+                // const annotation=this.annotationData.toJsonString()
+                // // console.log(annotation)
+                // if(this.annotationData===null){
+                //     console.error("no annotation data")
+                // }
+                // //ラベルを付けていないbounding boxがあるときはアラートを表示する
+                // if(this.annotationData){
+                //     const existsNoLabelBoundingBox=this.annotationData
+                //         .findBoundingBoxes(this.defaultLabel).length >0
+                //     if(existsNoLabelBoundingBox){
+                //         alert("ラベルを付けていないBounding Boxが存在します。\nラベルを付けてください")
+                //         return
+                //     }
+
+                // }
+                // ApiManager.writeFile(annotationPath,annotation)
+                try{
+                    await this.saveAnnotation(previousSelectedImageIndex)
+                }catch(e){
+                    alert(e)
                     return
                 }
-                //TODO:annotationData.boundingBoxesの座標は画像上での座標ではないので、
-                //変換する必要がある。
-
-
-                const annotation=this.annotationData.toJsonString()
-                // console.log(annotation)
-                if(this.annotationData===null){
-                    console.error("no annotation data")
-                }
-                //ラベルを付けていないbounding boxがあるときはアラートを表示する
-                if(this.annotationData){
-                    const existsNoLabelBoundingBox=this.annotationData
-                        .findBoundingBoxes(this.defaultLabel).length >0
-                    if(existsNoLabelBoundingBox){
-                        alert("ラベルを付けていないBounding Boxが存在します。\nラベルを付けてください")
-                        return
-                    }
-
-                }
-                ApiManager.writeFile(annotationPath,annotation)
             }
 
             //次の画像に変える
@@ -258,6 +264,41 @@ export default Vue.extend({
         updateBoundingBoxes(newBoundingBoxes:BoundingBox[]){
             // console.log("UPDATE")
             this.annotationData.boundingBoxes=newBoundingBoxes
+        },
+
+        async saveAnnotation(index:number){
+            //TODO:アノテーションファイルのパスの取得関数欲しい
+            const filename=this.imageDataList[index].filename
+
+            const annotationRootPath=await ApiManager.resolvePath(this.projectInfo.location,this.projectInfo.annotationPath)
+            const annotationPath=await ApiManager.joinPath(annotationRootPath,`${filename}.json`)
+            //アノテーションのフォルダがない時はアラートを表示する
+            if(! (await ApiManager.existsPath(annotationRootPath))){
+                // alert("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
+                throw new Error("アノテーションフォルダーがありません。\nフォルダーを作成してください。\n"+annotationRootPath)
+                // return
+            }
+            //TODO:annotationData.boundingBoxesの座標は画像上での座標ではないので、
+            //変換する必要がある。
+
+
+            const annotation=this.annotationData.toJsonString()
+            // console.log(annotation)
+            if(this.annotationData===null){
+                console.error("no annotation data")
+            }
+            //ラベルを付けていないbounding boxがあるときはアラートを表示する
+            if(this.annotationData){
+                const existsNoLabelBoundingBox=this.annotationData
+                    .findBoundingBoxes(this.defaultLabel).length >0
+                if(existsNoLabelBoundingBox){
+                    // alert("ラベルを付けていないBounding Boxが存在します。\nラベルを付けてください")
+                    throw new Error("ラベルを付けていないBounding Boxが存在します。\nラベルを付けてください")
+                    // return
+                }
+
+            }
+            ApiManager.writeFile(annotationPath,annotation)
         }
     }
 })
