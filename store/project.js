@@ -2,14 +2,12 @@ import {ProjectInfo} from "@/utils/projectInfo"
 
 export const state=()=>({
     // list:[],
-    projectInfo:new ProjectInfo("","") //TODO:nullに
+    projectInfo:new ProjectInfo("","","","","") //TODO:nullに
 })
 
 export const mutations={
-    new(state,project){
-        state.projectInfo=new ProjectInfo(
-            project.name,project.location
-        )
+    new(state,projectInfo){
+        state.projectInfo=projectInfo
     },
     loadClasses(state,classes){
         state.projectInfo.classes=classes

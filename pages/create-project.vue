@@ -32,6 +32,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import {ApiManager} from "@/utils/apiManager"
+import { ProjectInfo } from '~/utils/projectInfo'
 
 export default Vue.extend({
     data(){
@@ -65,6 +66,7 @@ export default Vue.extend({
                 return
             }
 
+
             const dstPath=location+"\\"+projectName //TODO:path.join
             const exists=await ApiManager.existsPath(dstPath)
             if(exists){
@@ -75,12 +77,11 @@ export default Vue.extend({
                 })
                 return
             }
-            await ApiManager.createProject(projectName,location)
 
-            this.$store.commit("project/new",{
-                projectName:this.projectName,
-                location:this.location
-            })
+            const projectInfo=new ProjectInfo(projectName,location)
+            await ApiManager.createProject(projectInfo)
+
+            this.$store.commit("project/new",projectInfo)
             
             this.$router.push("/rect-annotator")
         },

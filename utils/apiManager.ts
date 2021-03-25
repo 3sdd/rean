@@ -2,6 +2,7 @@
 //window.api.send('key')の形から、関数の形で使いやすくする
 
 import { IImageData } from "./imageData"
+import { ProjectInfo } from "./projectInfo"
 
 //TODO:asyncっていつつけるんだ
 export class ApiManager{
@@ -26,32 +27,40 @@ export class ApiManager{
         return this.invoke("showMessageBox",{options})
     }
 
-    static async createProject(projectName:string,path:string){
+    static async createProject(projectInfo:ProjectInfo){
+        //TODO:path.join()欲しい
         //ルートフォルダー作成
-        const rootPath=path+"\\"+projectName
+        const rootPath=await ApiManager.joinPath(projectInfo.location,projectInfo.projectName)
+    
+        // const rootPath=path+"\\"+projectName
         await this.mkdir(rootPath)
         
         //画像フォルダー作成
-        const imgDirPath=rootPath+"\\"+"images"
+        // const imgDirPath=rootPath+"\\"+"images"
+        const imgDirPath=await ApiManager.resolvePath(rootPath,projectInfo.imagePath)
+        console.log(imgDirPath)
         await this.mkdir(imgDirPath)
         
         //アノテーションフォルダー作成
-        const annoDirPath=rootPath+"\\"+"annotations"
+        // const annoDirPath=rootPath+"\\"+"annotations"
+        const annoDirPath=await ApiManager.resolvePath(rootPath,projectInfo.annotationPath)
         await this.mkdir(annoDirPath)
 
         //クラスファイル作成
-        const classesPath=rootPath+"\\"+"classes.txt"
+        // const classesPath=rootPath+"\\"+"classes.txt"
+        const classesPath=await ApiManager.resolvePath(rootPath,projectInfo.classPath)
         await this.createEmptyFile(classesPath)
 
         //rean.project.json作成
-        const projectInfo={
+        const projectInfoJson={
             "version":"0.1.0",
-            "annotationPath":"./annotations",
-            "imagePath":"./images",
-            "classPath":"./classes.txt"
+            "annotationPath":projectInfo.annotationPath,
+            "imagePath":projectInfo.imagePath,
+            "classPath":projectInfo.classPath
         }
-        const projectJsonString=JSON.stringify(projectInfo,null,4)
-        await this.writeFile(rootPath+"\\"+"rean.project.json",projectJsonString)
+        const jsonPath=await ApiManager.resolvePath(rootPath,"./rean.project.json")
+        const projectJsonString=JSON.stringify(projectInfoJson,null,4)
+        await this.writeFile(jsonPath,projectJsonString)
 
     }
 
@@ -102,6 +111,14 @@ export class ApiManager{
     static async readFile(path:string){
         const content=await this.invoke("readFile",{path})
         return content as string
+    }
+
+    static async joinPath(...paths:string[]){
+        return await this.invoke("joinPath",{paths}) as string
+    }
+
+    static async resolvePath(...paths:string[]){
+        return  await this.invoke("resolvePath",{paths}) as string
     }
 
 }

@@ -18,6 +18,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import {ApiManager} from "@/utils/apiManager"
+import { ProjectInfo } from '~/utils/projectInfo'
 
 export default Vue.extend({
     data(){
@@ -45,10 +46,15 @@ export default Vue.extend({
             this.projectRootPath=result.filePaths[0]
         },
         openProject(){
-            this.$store.commit("project/new",{
-                projectName:"TODO:プロジェクト名", //TODO:projectRootPathのフォルダー名を入れる
-                location:this.projectRootPath
-            })
+            //TODO:読み込んだ情報でインスタンス作成するようにする
+            const projectInfo=new ProjectInfo(
+                "TODO:プロジェクト名",this.projectRootPath,
+                "","",""
+            )
+            // this.$store.commit("project/new",{
+            //     projectName:"TODO:プロジェクト名", //TODO:projectRootPathのフォルダー名を入れる
+            //     location:this.projectRootPath
+            // })
 
             this.$router.push("/rect-annotator")
         }
