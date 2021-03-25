@@ -114,4 +114,8 @@ export class ApiManager{
         return  await this.invoke("resolvePath",{paths}) as string
     }
 
+    static async parsePath(path:string){
+        return await this.invoke("parsePath",{path}) as any
+    }
+
 }

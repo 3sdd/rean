@@ -114,6 +114,11 @@ function resolvePath(event,args){
     return path.resolve(...paths)
 }
 
+function parsePath(event,args){
+    const {path:p}=args
+    return path.parse(p)
+}
+
 module.exports={
     existsPath,
     mkdir,
@@ -127,6 +132,8 @@ module.exports={
     readImageData,
     writeFile,
     readFile,
+
     joinPath,
-    resolvePath
+    resolvePath,
+    parsePath,
 }
