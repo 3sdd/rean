@@ -24,6 +24,7 @@ export default Vue.extend({
     data(){
         return {
             projectRootPath:"",
+            reanProjectJson:null as any,
         }
     },
     async fetch(){
@@ -37,7 +38,6 @@ export default Vue.extend({
                 properties:["openFile"],
                 filters:[{name:"rean.project.json",extensions:["project.json"]}]
             })
-            // console.log(result)
             if(result.canceled){
                 return
             }
@@ -46,7 +46,6 @@ export default Vue.extend({
             }
 
             const path=result.filePaths[0]
-            console.log(path)
 
             const s=await ApiManager.parsePath(path)
             const filename=s.base
@@ -57,17 +56,23 @@ export default Vue.extend({
             }
             
             this.projectRootPath=rootDir
+
+            const obj=await ApiManager.readFile(path)
+            this.reanProjectJson=obj
         },
         openProject(){
-            //TODO:読み込んだ情報でインスタンス作成するようにする
+            if(!this.reanProjectJson){
+                throw new Error("rean.project.jsonエラー")
+            }
+            //TODO:プロジェクト名を直す
+            const annotationPath=this.reanProjectJson.annotationPath
+            const imagePath=this.reanProjectJson.imagePath
+            const classPath=this.reanProjectJson.classPath
             const projectInfo=new ProjectInfo(
                 "TODO:プロジェクト名",this.projectRootPath,
-                "","",""
+                annotationPath,imagePath,classPath
             )
-            // this.$store.commit("project/new",{
-            //     projectName:"TODO:プロジェクト名", //TODO:projectRootPathのフォルダー名を入れる
-            //     location:this.projectRootPath
-            // })
+            this.$store.commit("project/new",projectInfo)
 
             this.$router.push("/rect-annotator")
         }
