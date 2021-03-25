@@ -28,26 +28,19 @@ export class ApiManager{
     }
 
     static async createProject(projectInfo:ProjectInfo){
-        //TODO:path.join()欲しい
         //ルートフォルダー作成
         const rootPath=await ApiManager.joinPath(projectInfo.location,projectInfo.projectName)
-    
-        // const rootPath=path+"\\"+projectName
         await this.mkdir(rootPath)
         
         //画像フォルダー作成
-        // const imgDirPath=rootPath+"\\"+"images"
         const imgDirPath=await ApiManager.resolvePath(rootPath,projectInfo.imagePath)
-        console.log(imgDirPath)
         await this.mkdir(imgDirPath)
         
         //アノテーションフォルダー作成
-        // const annoDirPath=rootPath+"\\"+"annotations"
         const annoDirPath=await ApiManager.resolvePath(rootPath,projectInfo.annotationPath)
         await this.mkdir(annoDirPath)
 
         //クラスファイル作成
-        // const classesPath=rootPath+"\\"+"classes.txt"
         const classesPath=await ApiManager.resolvePath(rootPath,projectInfo.classPath)
         await this.createEmptyFile(classesPath)
 
