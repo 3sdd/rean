@@ -27,6 +27,7 @@ if (config.dev) {
 let win = null;
 const electron = require("electron");
 const app = electron.app;
+
 const newWin = () => {
     win = new electron.BrowserWindow({
         width:600,
@@ -86,3 +87,59 @@ for(const key of Object.keys(t)){
 ipcMain.handle("maximizeWindow",(event,args)=>{
   win.maximize()
 })
+
+
+const Menu=electron.Menu
+const isMac=process.platform==="darwin"
+
+const template=[
+  ...(isMac?[{
+    label:app.name,
+    submenu: [
+      { role: 'about' },
+      { type: 'separator' },
+      { role: 'services' },
+      { type: 'separator' },
+      { role: 'hide' },
+      { role: 'hideothers' },
+      { role: 'unhide' },
+      { type: 'separator' },
+      { role: 'quit' }
+    ]
+  }]:[]),
+  {
+    label:"ファイル",
+    submenu:[
+      isMac?
+        {role:"close",label:"閉じる"}:
+        {role:"quit",label:"閉じる"}
+    ]
+  },
+  {
+    label:"編集",
+    submenu:[
+      {role:"undo",label:"元に戻す(undo)"},
+      {role:"redo",label:"やり直し(redo)"}
+    ]
+  },
+  {
+    label:"ビュー",
+    submenu:[
+      {role:"reload",label:"リロード"},
+      {role:"forceReload",label:"強制リロード"},
+      {role:"toggleDevTools",label:"開発ツール切り替え"},
+      { type: 'separator' },
+      {role:"togglefullscreen",label:"フルスクリーン"}
+    ]
+  },
+  {
+    label:"ウィンドウ",
+    submenu:[
+      {role:"minimize",label:"最小化"},
+      {label:"最大化",click:()=>win.maximize()}
+    ]
+  }
+]
+
+const menu=Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)
