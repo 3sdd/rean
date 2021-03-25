@@ -67,7 +67,7 @@ export default Vue.extend({
             }
 
 
-            const dstPath=location+"\\"+projectName //TODO:path.join
+            const dstPath=await ApiManager.joinPath(location,projectName)
             const exists=await ApiManager.existsPath(dstPath)
             if(exists){
                 ApiManager.showMessageBox({
