@@ -104,6 +104,10 @@ async function readFile(event,args){
     return content
 }
 
+function joinPath(event,args){
+    const {paths}=args
+    return path.join(...paths)
+}
 module.exports={
     existsPath,
     mkdir,
@@ -116,5 +120,6 @@ module.exports={
     readImageAsBase64,
     readImageData,
     writeFile,
-    readFile
+    readFile,
+    joinPath
 }
