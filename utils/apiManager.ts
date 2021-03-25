@@ -68,8 +68,9 @@ export class ApiManager{
     }
 
     static async readClasses(path:string){
-        const classes=await  this.invoke("readClasses",{path})
-        return classes as string[]
+        const classes=await  this.invoke("readClasses",{path}) as string[]
+        //クラスの中で空白("")のものは除く
+        return classes.filter(x=>x!=="")
     }
 
     static async showOpenDialog(options:any){
