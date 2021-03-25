@@ -38,6 +38,7 @@ export default Vue.extend({
         return {
             projectName:"",
             location:"",
+            isCreatingProject:false,
         }
     },
     async fetch(){
@@ -46,10 +47,13 @@ export default Vue.extend({
     },
     methods:{
         async create(){
-            //TODO:2回目の作成ボタン押したときに重複して作らないようにする
+            if(this.isCreatingProject){
+                return
+            }
+            this.isCreatingProject=true
+
             const projectName=this.projectName
             const location=this.location
-            // console.log(location)
 
             if(projectName===""){
                 //TODO:alertではだめ？
