@@ -34,12 +34,25 @@ export class ApiManager{
         //画像フォルダー作成
         const imgDirPath=rootPath+"\\"+"images"
         await this.mkdir(imgDirPath)
-
+        
+        //アノテーションフォルダー作成
         const annoDirPath=rootPath+"\\"+"annotations"
         await this.mkdir(annoDirPath)
-        
+
+        //クラスファイル作成
         const classesPath=rootPath+"\\"+"classes.txt"
         await this.createEmptyFile(classesPath)
+
+        //rean.project.json作成
+        const projectInfo={
+            "version":"0.1.0",
+            "annotationPath":"./annotations",
+            "imagePath":"./images",
+            "classPath":"./classes.txt"
+        }
+        const projectJsonString=JSON.stringify(projectInfo,null,4)
+        await this.writeFile(rootPath+"\\"+"rean.project.json",projectJsonString)
+
     }
 
     static async createEmptyFile(path:string){
