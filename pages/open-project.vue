@@ -34,7 +34,8 @@ export default Vue.extend({
         async openDialog(){
             const result=await ApiManager.showOpenDialog({
                 defaultPath:this.projectRootPath,
-                properties:["openDirectory"]
+                properties:["openFile"],
+                filters:[{name:"rean.project.json",extensions:["project.json"]}]
             })
             // console.log(result)
             if(result.canceled){
@@ -43,7 +44,19 @@ export default Vue.extend({
             if(result.filePaths.length!==1){
                 throw new Error("エラー:ファイルパスの数が１つではない")
             }
-            this.projectRootPath=result.filePaths[0]
+
+            const path=result.filePaths[0]
+            console.log(path)
+
+            const s=await ApiManager.parsePath(path)
+            const filename=s.base
+            const rootDir=s.dir
+
+            if(filename!=="rean.project.json"){
+                throw new Error("rean.project.jsonを選択してください。")
+            }
+            
+            this.projectRootPath=rootDir
         },
         openProject(){
             //TODO:読み込んだ情報でインスタンス作成するようにする
