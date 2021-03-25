@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div>
-      <nuxt-link to="/create-project" class="block">プロジェクト作成</nuxt-link>
-      <nuxt-link to="/open-project" class="block">プロジェクトを開く</nuxt-link>
+      <nuxt-link to="/create-project" class="block p-2 border-2 rounded mb-2">プロジェクト作成</nuxt-link>
+      <nuxt-link to="/open-project" class="block p-2 border-2 rounded mb-2">プロジェクトを開く</nuxt-link>
       <!-- <nuxt-link to="/rect-annotator" class="block">debug＿アノテーションページ</nuxt-link> -->
     </div>
   </div>
