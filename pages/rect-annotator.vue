@@ -8,8 +8,12 @@
         </div>
         <div class="flex-1 flex flex-row overflow-y-auto bg-white">
             <div class="w-60 overflow-y-auto p-1 flex-shrink-0">
-                <div class="mx-auto text-center font-bold text-white mb-5">
-                    
+                <div class="mx-auto text-center font-bold text-black mb-5 text-lg border-2">
+                    <div>
+                        {{selectedImageIndex+1}}<span class="text-xs ml-1">枚目</span>
+                        <span class="mx-1">/</span>
+                        {{totalNumImages}}<span class="text-xs ml-1">枚</span>
+                    </div>
                 </div>
                 <ThumbnailViewer 
                     :base64images="getBase64Images()"
@@ -97,7 +101,7 @@ export default Vue.extend({
 
         //ショートカット登録
         const refAnnotationPage=this.$refs.annotationPage as HTMLElement
-        refAnnotationPage.addEventListener("keydown",(e:KeyboardEvent)=>{
+        refAnnotationPage.addEventListener("keydown",async (e:KeyboardEvent)=>{
             if(e.key==="a"){
                 if(this.selectedImageIndex-1<0){
                     alert("最初の画像です。前に戻れません。")
@@ -115,6 +119,15 @@ export default Vue.extend({
                     return
                 }
                 this.removeBoundingBox(this.selectedBoundingBoxIndex)
+            }else if(e.ctrlKey && e.key==="s"){
+                try{
+                    //async function
+                    await this.saveAnnotation(this.selectedImageIndex)
+                    alert("アノテーションデータを保存しました")
+                }catch(e){
+                    alert(e)
+                    return
+                }
             }
         })
 
@@ -145,6 +158,10 @@ export default Vue.extend({
             const d=this.imageDataList[this.selectedImageIndex]
             return d
         },
+        totalNumImages(){
+            const numImages= this.imageDataList.length as number
+            return numImages
+        }
     },
     methods:{
         //TODO: selectedImageIndexがこの関数内で indexの値に変更されるようになっている　のをどうにかする
