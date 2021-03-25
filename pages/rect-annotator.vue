@@ -73,9 +73,9 @@ export default Vue.extend({
         }
     },
     async mounted(){
-
-        const classFilePath:string =this.rootPath+"\\"+"classes.txt"
-        const imgRoot:string =this.rootPath+"\\"+"images"
+        console.log(this.projectInfo)
+        const classFilePath:string =await ApiManager.resolvePath(this.rootPath,this.projectInfo.classPath)
+        const imgRoot:string =await ApiManager.resolvePath(this.rootPath,this.projectInfo.imagePath)
 
         const classes=await ApiManager.readClasses(classFilePath)
         this.$store.commit("project/loadClasses",classes)
@@ -86,7 +86,7 @@ export default Vue.extend({
 
 
         for(const imgFile of imageFiles){
-            const imgPath=imgRoot+"\\"+imgFile
+            const imgPath=await ApiManager.joinPath(imgRoot,imgFile)
             const imageData=await ApiManager.readImageData(imgPath)
 
             this.imageDataList.push(imageData)
