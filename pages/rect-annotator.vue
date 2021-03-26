@@ -4,7 +4,7 @@
         tabindex="0"
     >
         <div class="p-2 bg-gray-300">
-            <p>残り枚数 10000枚</p>
+            <p>！</p>
         </div>
         <div class="flex-1 flex flex-row overflow-y-auto bg-white">
             <div class="w-60 overflow-y-auto p-1 flex-shrink-0">
@@ -22,7 +22,27 @@
                 >
                 </ThumbnailViewer>
             </div>
+            <div>
+                <div class="w-full bg-red-200">
+                    <div>
+                        拡大
+                    </div>
+                    <div @click="expand('upper-left')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
+                        ┌
+                    </div>
+                    <div @click="expand('lower-left')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
+                        └
+                    </div>
+                    <div @click="expand('upper-right')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
+                        ┐
+                    </div>
+                    <div @click="expand('lower-right')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
+                        ┘
+                    </div>
+                </div>
+            </div>
             <div class="flex-1 bg-gray-700">
+
                 <AnnotationEditor
                     :mainImageBase64="mainImageBase64"
                     :imageData="selectedImageData"
@@ -316,6 +336,40 @@ export default Vue.extend({
 
             }
             ApiManager.writeFile(annotationPath,annotation)
+        },
+        expand(type:"upper-left"|"lower-left"|"upper-right"|"lower-right"){
+            const bboxIndex=this.selectedBoundingBoxIndex
+            if(bboxIndex===-1){
+                return
+            }
+            console.log(this.annotationData)
+            const bbox=this.annotationData.boundingBoxes[bboxIndex]
+
+            const xmax=this.annotationData.imageWidth
+            const ymax=this.annotationData.imageHeight
+
+            if(xmax===-1 || ymax===-1){
+                throw new Error(`annotation data : image width or height ===-1(imageWidth=${xmax},imageHeight=${ymax})`)
+            }
+
+            switch(type){
+                case "upper-left":                
+                    bbox.xmin=0
+                    bbox.ymin=0
+                    break
+                case "lower-left":
+                    bbox.xmin=0
+                    bbox.ymax=ymax
+                    break
+                case "upper-right":
+                    bbox.xmax=xmax
+                    bbox.ymin=0
+                    break
+                case "lower-right":
+                    bbox.xmax=xmax
+                    bbox.ymax=ymax
+                    break
+            }
         }
     }
 })
