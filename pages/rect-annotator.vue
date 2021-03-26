@@ -7,7 +7,7 @@
             <p>！</p>
         </div>
         <div class="flex-1 flex flex-row overflow-y-auto bg-white">
-            <div class="w-60 overflow-y-auto p-1 flex-shrink-0">
+            <div class="w-60 overflow-y-auto p-1 flex-shrink-0 border-r-2 border-gray-400">
                 <div class="mx-auto text-center font-bold text-black mb-5 text-lg border-2">
                     <div>
                         {{selectedImageIndex+1}}<span class="text-xs ml-1">枚目</span>
@@ -23,21 +23,23 @@
                 </ThumbnailViewer>
             </div>
             <div>
-                <div class="w-full bg-red-200">
+                <div class="w-full">
                     <div>
                         拡大
                     </div>
-                    <div @click="expand('upper-left')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
-                        ┌
-                    </div>
-                    <div @click="expand('lower-left')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
-                        └
-                    </div>
-                    <div @click="expand('upper-right')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
-                        ┐
-                    </div>
-                    <div @click="expand('lower-right')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center">
-                        ┘
+                    <div class="grid grid-cols-2">
+                        <div @click="expand('upper-left')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center hover:bg-blue-50">
+                            ┌
+                        </div>
+                        <div @click="expand('upper-right')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center hover:bg-blue-50">
+                            ┐
+                        </div>
+                        <div @click="expand('lower-left')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center hover:bg-blue-50">
+                            └
+                        </div>
+                        <div @click="expand('lower-right')" class="border-2 border-blue-300 w-7 h-7 flex justify-center items-center hover:bg-blue-50">
+                            ┘
+                        </div>
                     </div>
                 </div>
             </div>
@@ -320,10 +322,9 @@ export default Vue.extend({
 
 
             const annotation=this.annotationData.toJsonString()
-            // console.log(annotation)
-            if(this.annotationData===null){
-                console.error("no annotation data")
-            }
+            // if(this.annotationData===null){
+            //     console.error("no annotation data")
+            // }
             //ラベルを付けていないbounding boxがあるときはアラートを表示する
             if(this.annotationData){
                 const existsNoLabelBoundingBox=this.annotationData
@@ -334,6 +335,11 @@ export default Vue.extend({
                     // return
                 }
 
+            }
+
+            if(this.annotationData.imageWidth===-1 || this.annotationData.imageHeight===-1){
+                alert("アノテーションデータにおかしい値があります。\n修正してください。\nimage width ===-1 or image height===-1")
+                return
             }
             ApiManager.writeFile(annotationPath,annotation)
         },
