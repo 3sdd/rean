@@ -1,5 +1,5 @@
 <template>
-    <g class="bbox cursor-move">
+    <g class="cursor-move" :class="isSelected?'selected-bbox':'bbox'">
         <rect :x="xmin" :y="ymin" :width="width" :height="height" :fill="transparentColor" 
             :stroke="color" stroke-width="4" stroke-dasharray="0"
             class="bbox-main"
@@ -15,6 +15,7 @@
         ></rect>
         <text :x="xmin" :y="ymin" font-size="15" dominant-baseline="text-before-edge"
             fill="white"
+            class="label-text"
         >
             {{label}}
         </text>
@@ -56,13 +57,14 @@
         <g v-if="isSelected">
             <rect v-if="showRemoveButton" :x="xmax+10" :y="ymin+10" width="25" height="25"
                 rx="2" ry="2"
-                fill="gray"
+                fill="white"
+                stroke="red"
                 class="remove-button cursor-pointer"
                 @click="onClickRemoveButton"
                 
             >
             </rect>
-            <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" :stroke="color" stroke-width="30" 
+            <path :transform="`translate(${xmax+10+2},${ymin+10+2}) scale(0.2)`" d="M 10,10 l 90,90 M 100,10 l -90,90" stroke="red" stroke-width="30" 
                 class="pointer-events-none"
             />
         </g>
@@ -215,19 +217,27 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.bbox:hover .bbox-point{
+.bbox:hover .bbox-point, 
+.bbox:hover .rect-label{
     fill:rgba(0,255,0,1);
 }
 .bbox:hover .bbox-main{
     fill: rgba(0,255,0,0.3);
     stroke:rgba(0,255,0,1);
 }
-.bbox:hover .remove-button{
-    fill:rgba(0,255,0,0.3);
+
+.selected-bbox .bbox-point, 
+.selected-bbox .rect-label{
+    fill:rgb(251, 255, 0);
 }
-.bbox:hover .rect-label{
-    fill:rgba(0,255,0,1);
+.selected-bbox .bbox-main{
+    fill: rgba(251, 255, 0,0.3);
+    stroke:rgb(251, 255, 0,1);
 }
+.selected-bbox .label-text{
+    fill:rgb(0,0,0)
+}
+
 
 .cursor-nwse{
     cursor: nwse-resize ;
