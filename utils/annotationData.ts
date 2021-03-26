@@ -43,8 +43,8 @@ export class BoundingBox{
 export class AnnotationData{
     static version="0.1"
     boundingBoxes:BoundingBox[]=[]
-    imageWidth:number|null=null//TODO:
-    imageHeight:number|null=null//TODO:
+    imageWidth:number=-1
+    imageHeight:number=-1
     constructor(){
     }
 
