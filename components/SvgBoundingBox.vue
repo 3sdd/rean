@@ -235,7 +235,7 @@ export default Vue.extend({
     stroke:rgb(251, 255, 0,1);
 }
 .selected-bbox .label-text{
-    fill:rgb(0,0,0)
+    fill:rgb(0,0,0);
 }
 
 
