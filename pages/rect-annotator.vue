@@ -3,8 +3,10 @@
         ref="annotationPage"
         tabindex="0"
     >
-        <div class="p-2 bg-gray-300">
-            <p>！</p>
+        <div class="p-1 bg-gray-300 flex">
+            <div @click="exportData()" class="border-2 p-1 hover:bg-gray-200">
+                export
+            </div>
         </div>
         <div class="flex-1 flex flex-row overflow-y-auto bg-white">
             <div class="w-60 overflow-y-auto p-1 flex-shrink-0 border-r-2 border-gray-400">
@@ -376,6 +378,62 @@ export default Vue.extend({
                     bbox.ymax=ymax
                     break
             }
+        },
+        async exportData(){
+            // alert("エクスポート機能はまだ実装されていません")
+            const exportPath=await ApiManager.resolvePath(this.projectInfo.location,this.projectInfo.exportPath)
+            ApiManager.mkdir(exportPath)
+
+            //imagesフォルダーと画像をコピー
+            const imgDirPath=await ApiManager.joinPath(exportPath,"images")
+            await ApiManager.mkdir(imgDirPath)
+            
+
+            //annotation.json作成
+            const annoPath=await ApiManager.joinPath(exportPath,"annotation.json")
+
+            const data=[]
+            for(let i=0;i<this.imageDataList.length;i++){
+                const imgData=this.imageDataList[i]
+                const imgFilename=imgData.filename
+                const annoFilename=imgFilename+".json"
+
+                const bboxes=[]
+                for(const bbox of this.annotationData.boundingBoxes){
+                    bboxes.push({
+                        "xmin":bbox.xmin,
+                        "ymin":bbox.ymin,
+                        "xmax":bbox.xmax,
+                        "ymax":bbox.ymax,
+                        "label":bbox.label
+                    })
+                }
+                data.push({
+                    "version":"0.1",
+                    "imageWidth":imgData.imageWidth,
+                    "imageHeight":imgData.imageHeight,
+                    "imageFilename":imgFilename,
+                    "annotationFilename":annoFilename,
+                    "boundingBoxes":bboxes,
+                })
+            }
+            const annotationObj={
+                data
+            }
+            const annotationJson=JSON.stringify(annotationObj,null,4)
+            await ApiManager.writeFile(annoPath,annotationJson)
+
+
+            //class.txt作成
+            const classPath=await ApiManager.joinPath(exportPath,"class.txt")
+            const classesText=this.projectInfo.classes.join("\n")
+            await ApiManager.writeFile(classPath,classesText)
+
+            // TODO:exportフォルダーをzipにしたexport.zipを作成してexportフォルダーに入れる
+
+            alert("エクスポート完了")
+
+
         }
     }
 })

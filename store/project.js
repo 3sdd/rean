@@ -1,7 +1,7 @@
 import {ProjectInfo} from "@/utils/projectInfo"
 
 export const state=()=>({
-    projectInfo:new ProjectInfo("","","","","") //TODO:nullに
+    projectInfo:new ProjectInfo("","","","","","") //TODO:nullに
 })
 
 export const mutations={

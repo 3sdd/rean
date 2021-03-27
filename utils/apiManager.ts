@@ -49,7 +49,8 @@ export class ApiManager{
             "version":"0.1.0",
             "annotationPath":projectInfo.annotationPath,
             "imagePath":projectInfo.imagePath,
-            "classPath":projectInfo.classPath
+            "classPath":projectInfo.classPath,
+            "exportPath":projectInfo.exportPath,
         }
         const jsonPath=await ApiManager.resolvePath(rootPath,"./rean.project.json")
         const projectJsonString=JSON.stringify(projectInfoJson,null,4)

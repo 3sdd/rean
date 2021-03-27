@@ -70,7 +70,8 @@ export default Vue.extend({
             const classPath=this.reanProjectJson.classPath
             const projectInfo=new ProjectInfo(
                 "TODO:プロジェクト名",this.projectRootPath,
-                annotationPath,imagePath,classPath
+                annotationPath,imagePath,classPath,
+                this.reanProjectJson.exportPath
             )
             this.$store.commit("project/new",projectInfo)
 
