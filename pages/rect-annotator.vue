@@ -382,13 +382,20 @@ export default Vue.extend({
         async exportData(){
             // alert("エクスポート機能はまだ実装されていません")
             const exportPath=await ApiManager.resolvePath(this.projectInfo.location,this.projectInfo.exportPath)
+            const existsExportPath=await ApiManager.existsPath(exportPath)
+            if(existsExportPath){
+                alert("エクスポート先がすでに存在しています。\n"+exportPath)
+                return
+            }
             ApiManager.mkdir(exportPath)
 
             //imagesフォルダーと画像をコピー
+            const srcImgDir=await ApiManager.resolvePath(this.projectInfo.location,this.projectInfo.imagePath)
             const imgDirPath=await ApiManager.joinPath(exportPath,"images")
             await ApiManager.mkdir(imgDirPath)
-            
 
+            
+            //画像のコピーと
             //annotation.json作成
             const annoPath=await ApiManager.joinPath(exportPath,"annotation.json")
 
@@ -396,10 +403,26 @@ export default Vue.extend({
             for(let i=0;i<this.imageDataList.length;i++){
                 const imgData=this.imageDataList[i]
                 const imgFilename=imgData.filename
+
+                //アノテーション存在チェック
                 const annoFilename=imgFilename+".json"
+                const annoPath=await ApiManager.resolvePath(this.projectInfo.location,this.projectInfo.annotationPath,annoFilename)
+                const existsAnno=await ApiManager.existsPath(annoPath)
+                if(!existsAnno){
+                    continue
+                }
+                //画像をexportへコピー
+                const srcImgPath=await ApiManager.joinPath(srcImgDir,imgFilename)
+                const dstImgPath=await ApiManager.joinPath(imgDirPath,imgFilename)
+                await ApiManager.copyFile(srcImgPath,dstImgPath)
+
+                //アノテーション情報をexport
+                const annojsonstr=await ApiManager.readFile(annoPath)
+                const annoJson=JSON.parse(annojsonstr)
+                // alert(annojson)
 
                 const bboxes=[]
-                for(const bbox of this.annotationData.boundingBoxes){
+                for(const bbox of annoJson.boundingBoxes){
                     bboxes.push({
                         "xmin":bbox.xmin,
                         "ymin":bbox.ymin,
