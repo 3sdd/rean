@@ -107,6 +107,11 @@ export class ApiManager{
         const content=await this.invoke("readFile",{path})
         return content as string
     }
+    static async copyFile(src:string,dest:string,flags:any=undefined){
+        await this.invoke("copyFile",{
+            src,dest,flags
+        })
+    }
 
     static async joinPath(...paths:string[]){
         return await this.invoke("joinPath",{paths}) as string

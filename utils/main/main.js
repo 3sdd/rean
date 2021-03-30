@@ -104,6 +104,12 @@ async function readFile(event,args){
     return content
 }
 
+async function copyFile(event,args){
+    const {src,dest,flags}=args
+    const ret=await fsPromise.copyFile(src,dest,flags)
+    return ret
+}
+
 function joinPath(event,args){
     const {paths}=args
     return path.join(...paths)
@@ -132,6 +138,7 @@ module.exports={
     readImageData,
     writeFile,
     readFile,
+    copyFile,
 
     joinPath,
     resolvePath,
